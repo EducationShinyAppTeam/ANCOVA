@@ -20,9 +20,11 @@ convertMenuItem <- function(mi,tabName) {
   mi
 }
 
-ui <- dashboardPage(skin = "black",
+ShinyUIdashboardPage(skin = "black",
                     dashboardHeader(title = "ANCOVA",
-                                    titleWidth = 180
+                                    titleWidth = 180,
+                                    tags$li(class = "dropdown", tags$a(href='https://shinyapps.science.psu.edu/',icon("home"))),
+                                    tags$li(class = "dropdown", actionLink("info",icon("info",class="myClass")))
                                     # Set height of dashboardHeader
                                     # tags$li(class = "dropdown",
                                     #         tags$style(".main-header {max-height: 45px}"),
@@ -49,9 +51,12 @@ ui <- dashboardPage(skin = "black",
                         tags$link(rel = "stylesheet", type = "text/css", href = "navcolor.css") #customised style sheet
                       ),
                       tags$head(
+                        tags$style(".fa-home {color:#FFFFFF}"),
+                        tags$style(".fa-info {color:#FFFFFF}"),
                         tags$style(HTML('#start{color:white;background-color: #BB8FCE}')),
                         tags$style(HTML('#go{color:white;background-color: #BB8FCE}')),
                         tags$style(HTML('#go2{color:white;background-color: #BB8FCE}')),
+                        tags$style(HTML('#game{color:white;background-color: #BB8FCE}')),
                         tags$style(HTML('#pre2{color:white;background-color: #BB8FCE}')),
                         tags$style(HTML('#submitA{color:white;background-color: #BB8FCE}')),
                         tags$style(HTML('#new{color:white;background-color: #BB8FCE}')),
@@ -192,19 +197,21 @@ ui <- dashboardPage(skin = "black",
                                     actionButton("go","G O !",icon("bolt"),class="circle grow")),
                                 br(),
                                 h3(strong('Acknowledgements:')),
-                                uiOutput("ack2")
+                                h4("This app was developed and coded by Luxin Wang."),
+                                uiOutput("ack2"),
+                                h4("This application was modified by Zhiruo Wang.")
                                 
                         ),
                         
                         
                         
                         tabItem(tabName ="exploring",
-                                div(style="display: inline-block;vertical-align:top;",
-                                    tags$a(href='https://shinyapps.science.psu.edu/',tags$img(src='homebut.PNG', width = 19))
-                                ),
-                                div(style="display: inline-block;vertical-align:top;",
-                                    circleButton("infobut",icon = icon("info"), status = "myClass",size = "xs")
-                                ),
+                                # div(style="display: inline-block;vertical-align:top;",
+                                #     tags$a(href='https://shinyapps.science.psu.edu/',tags$img(src='homebut.PNG', width = 19))
+                                # ),
+                                # div(style="display: inline-block;vertical-align:top;",
+                                #     circleButton("infobut",icon = icon("info"), status = "myClass",size = "xs")
+                                # ),
                                 h3('ANCOVA Interaction Plot'),
                                 sidebarLayout(
                                   sidebarPanel(
@@ -237,8 +244,10 @@ ui <- dashboardPage(skin = "black",
                                     plotOutput('plot_gg'),
                                     bsPopover('plot_gg', 'Notice', 'Different lines represent different values of covariate. Remember intersection does not imply significant interaction.', placement = "bottom", trigger = "hover", options = NULL),
                                     tags$b(verbatimTextOutput('analysis1')),
-                                    bsPopover('analysis1', 'ANOVA Table', 'Pay attention to the last column. Small p-value indicates siginificant influence or interaction.', placement = "top", trigger = "hover", options = NULL)
+                                    bsPopover('analysis1', 'ANOVA Table', 'Pay attention to the last column. Small p-value indicates siginificant influence or interaction.', placement = "top", trigger = "hover", options = NULL),
                                     
+                                    div(style = "text-align: center",
+                                        actionButton("game","go gaming!",icon("bolt"),class="circle grow"))
                                   )
                                 )
                                 
@@ -256,15 +265,15 @@ ui <- dashboardPage(skin = "black",
                                                 fluidRow(column(2,actionButton('start_timer','Start',style='padding:5px; font-size:90%')),
                                                          #column(2,actionButton('set','Set Timer',style='padding:5px; font-size:90%')),
                                                          column(2,actionButton('reset','Reset',style='padding:5px; font-size:90%')),
-                                                         column(1, tags$a(href='https://shinyapps.science.psu.edu/',tags$img(src='homebut.PNG', width = 30))),
-                                                         column(1, bsButton('bq1', '',icon = icon('info',class = "iconq fa-fw"),type = 'toggle', class = 'butt',style='padding:20px'),
-                                                                div(id = "plot-container1",
-                                                                    conditionalPanel("input.bq1 != 0",
-                                                                                     tags$img(src = "INS.png",
-                                                                                              id = "ins"))
-                                                                )
-                                                         ),
-                                                         
+                                                         # column(1, tags$a(href='https://shinyapps.science.psu.edu/',tags$img(src='homebut.PNG', width = 30))),
+                                                         # column(1, bsButton('bq1', '',icon = icon('info',class = "iconq fa-fw"),type = 'toggle', class = 'butt',style='padding:20px'),
+                                                         #        div(id = "plot-container1",
+                                                         #            conditionalPanel("input.bq1 != 0",
+                                                         #                             tags$img(src = "INS.png",
+                                                         #                                      id = "ins"))
+                                                         #        )
+                                                         # ),
+                                                         # 
                                                          column(1, bsButton('bq2', '',icon = icon('question',class = "iconq fa-fw"),type = 'toggle', class = 'butt',style='padding:20px'),
                                                                 div(id = "plot-container2",
                                                                     conditionalPanel("input.bq2 != 0",

@@ -36,7 +36,7 @@ shinyServer(function(input, output,session) {
     )
   })
   output$ack2<-renderUI((
-    h4('This app was developed and coded by Luxin Wang. Thanks for the data set and code provided by The University of Sheffield (',url,') and Dr.Dylan Childs(',url2,').')
+    h4('Thanks for the data set and code provided by The University of Sheffield (',url,') and Dr.Dylan Childs(',url2,').')
   ))
   
   url <- a("www.sheffield.ac.uk/mash/data", href="https://www.sheffield.ac.uk/mash/data",target="_blank")
@@ -61,6 +61,10 @@ shinyServer(function(input, output,session) {
   
   observeEvent(input$go,{
     updateTabItems(session,"tabs","exploring")
+  })
+  
+  observeEvent(input$game,{
+    updateTabItems(session,"tabs","game")
   })
   
   observeEvent(input$pre2,{
