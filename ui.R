@@ -20,8 +20,9 @@ convertMenuItem <- function(mi,tabName) {
   mi
 }
 
-ShinyUIdashboardPage(skin = "black",
-                    dashboardHeader(title = "ANCOVA",
+shinyUI(fluidPage(
+        dashboardPage(skin = "black",
+                      dashboardHeader(title = "ANCOVA",
                                     titleWidth = 180,
                                     tags$li(class = "dropdown", tags$a(href='https://shinyapps.science.psu.edu/',icon("home"))),
                                     tags$li(class = "dropdown", actionLink("info",icon("info",class="myClass")))
@@ -333,4 +334,4 @@ ShinyUIdashboardPage(skin = "black",
                       
                       
                       )                  
-                        )
+                        )))
