@@ -27,12 +27,13 @@ bank = data.frame(lapply(bank, as.character), stringsAsFactors = FALSE)
 
 shinyServer(function(input, output,session) {
 
-  observeEvent(input$infobut,{
+  observeEvent(input$info,{
     sendSweetAlert(
       session = session,
       title = "Instructions:",
-      text = "Pick a data set and variables to view the interaction plot and the associated ANOVA table.",
-      type = "info"
+      type = NULL,
+      closeOnClickOutside = TRUE,
+      text = "Pick a data set and variables to view the interaction plot and the associated ANOVA table."
     )
   })
   output$ack2<-renderUI((
