@@ -112,13 +112,90 @@ shinyUI(list(
                          modified by Zhiruo Wang and Lydia Bednarczyk.")
                       ),
       #Adding prerequisites page
-              tabItem(tabName="prereq",
-                      h3(strong('Background')),
+              tabItem(tabName = "prereq",
+                      h2('Prerequisites'),
                       h3('What is ANCOVA:'),
-                      h4('Analysis of variance with continuous variables added in. To know more about the difference between ANOVA, Regression, and ANCOVA, click'),
+                      h4('ANCOVA is the analysis of variance with continuous 
+                         variables added in. The information below will explain 
+                         the difference between ANOVA, Regression, and ANCOVA.'),
                       br(),
-                      div(style = "text-align: center",
-                          actionButton('pre2','Comparision of different analysis',class="circle grow")),
+                      fluidRow(
+                        column(
+                          width = 2,
+                          offset = 0,
+                          h4("X: Categorical", tags$br(),"Y: Continuous")
+                        ),
+                        column(
+                          width = 2,
+                          offset = 0,
+                          h4("------->")
+                          
+                        ),
+                        column(
+                          width = 6,
+                          offset = 0,
+                          h4("ANOVA is used for comparing three or more group means.",
+                             tags$br(),
+                             "Different groups are different levels of categorical 
+                             variables, and group means are calculated from continuous 
+                             variables.", 
+                             tags$br(), 
+                             "Example: Are the average scores 
+                             of three STAT 200 sections significantly different 
+                             from each other?")
+                        )
+                      ),
+                      fluidRow(
+                        column(
+                          width = 2,
+                          offset = 0,
+                          h4("X: Continuous", tags$br(),"Y: Continuous")
+                        ),
+                        column(
+                          width = 2,
+                          offset = 0,
+                          h4("------->")
+                          
+                        ),
+                        column(
+                          width = 6,
+                          offset = 0,
+                          h4("Regression is used for determining the relationship 
+                             between two continuous variables.",
+                             tags$br(),
+                             "One dependent variable (Y) can also be affected by 
+                             multiple independent variables (X).", 
+                             tags$br(), 
+                             "Example: How will crime rate be impacted by population 
+                             density, unemployment rate, and income?")
+                        )
+                      ),
+                      fluidRow(
+                        column(
+                          width = 2,
+                          offset = 0,
+                          h4("X: Categorical & Continuous", tags$br(),"Y: Continuous")
+                        ),
+                        column(
+                          width = 2,
+                          offset = 0,
+                          h4("------->")
+                          
+                        ),
+                        column(
+                          width = 6,
+                          offset = 0,
+                          h4("ANCOVA is adding continuous variables onto ANOVA 
+                             analysis, which is called covariate.",
+                             tags$br(),
+                             "Significant differences between group means, and 
+                             significant relationships between continuous variables 
+                             are both analyzed.", 
+                             tags$br(), 
+                             "Example: Who makes the most money? Will gender or 
+                             years after graduation influence the income?")
+                        )
+                      ),
                       
                       h3('Diagnostic Plots:'),
                       fluidRow(column(11,offset=2, img(src='plot.png',width=550),style='margin-top:-1em')),
@@ -137,47 +214,47 @@ shinyUI(list(
               
                         
                         
-                        tabItem(tabName='box',
-                                br(),
-                                fluidRow(
-                                  column(3, bsButton('ano',HTML('<b> X </b> :Categorical <br/>  Y: Continuous'),type = 'toggle')),
-                                  column(1, 
-                                         conditionalPanel("input.ano != 0",
-                                                          img(src='line1.png',width=250,style='margin-top:6em;margin-left:6.5em'))
-                                  ),
-                                  column(5, offset = 2,
-                                         conditionalPanel("input.ano != 0",
-                                                          tags$a(uiOutput('box1'),href='http://shiny.science.psu.edu/auc39/ANOVA/',target="_blank"))
-                                  )
-                                ),br(),br(),
-                                fluidRow(
-                                  column(3, bsButton('regression' ,HTML('<b> X </b>:Continuous <br/>  Y: Continuous'),type = 'toggle')),
-                                  column(1, 
-                                         conditionalPanel("input.regression != 0",
-                                                          img(src='line2.png',width=250,style='margin-top:6em;margin-left:6.5em'))
-                                  ),
-                                  column(5,offset=2,
-                                         conditionalPanel("input.regression != 0",
-                                                          tags$a(uiOutput('box2'),href='http://tjmcintyre.shinyapps.io/AssumptionsApp/',target="_blank"))
-                                  )
-                                ),br(),br(),
-                                fluidRow(
-                                  column(3, bsButton('anc',HTML('<b> X </b>:Categorical & Continuous <br/>  Y: Continuous'),type = 'toggle')),
-                                  column(1, 
-                                         conditionalPanel("input.anc != 0",
-                                                          img(src='line3.png',width=250,style='margin-top:6em;margin-left:6.5em'))
-                                  ),
-                                  column(5,offset=2,
-                                         conditionalPanel("input.anc != 0",
-                                                          uiOutput('box3'))
-                                  )
-                                ),br(),
-                                fluidRow(
-                                  column(3,offset=4,actionButton("go2","Go to the overview",icon("bolt"),style='padding:10px; font-size:100%',class="circle grow"))
-                                )
-                                
-                                
-                        ),
+                        # tabItem(tabName='box',
+                        #         br(),
+                        #         fluidRow(
+                        #           column(3, bsButton('ano',HTML('<b> X </b> :Categorical <br/>  Y: Continuous'),type = 'toggle')),
+                        #           column(1, 
+                        #                  conditionalPanel("input.ano != 0",
+                        #                                   img(src='line1.png',width=250,style='margin-top:6em;margin-left:6.5em'))
+                        #           ),
+                        #           column(5, offset = 2,
+                        #                  conditionalPanel("input.ano != 0",
+                        #                                   tags$a(uiOutput('box1'),href='http://shiny.science.psu.edu/auc39/ANOVA/',target="_blank"))
+                        #           )
+                        #         ),br(),br(),
+                        #         fluidRow(
+                        #           column(3, bsButton('regression' ,HTML('<b> X </b>:Continuous <br/>  Y: Continuous'),type = 'toggle')),
+                        #           column(1, 
+                        #                  conditionalPanel("input.regression != 0",
+                        #                                   img(src='line2.png',width=250,style='margin-top:6em;margin-left:6.5em'))
+                        #           ),
+                        #           column(5,offset=2,
+                        #                  conditionalPanel("input.regression != 0",
+                        #                                   tags$a(uiOutput('box2'),href='http://tjmcintyre.shinyapps.io/AssumptionsApp/',target="_blank"))
+                        #           )
+                        #         ),br(),br(),
+                        #         fluidRow(
+                        #           column(3, bsButton('anc',HTML('<b> X </b>:Categorical & Continuous <br/>  Y: Continuous'),type = 'toggle')),
+                        #           column(1, 
+                        #                  conditionalPanel("input.anc != 0",
+                        #                                   img(src='line3.png',width=250,style='margin-top:6em;margin-left:6.5em'))
+                        #           ),
+                        #           column(5,offset=2,
+                        #                  conditionalPanel("input.anc != 0",
+                        #                                   uiOutput('box3'))
+                        #           )
+                        #         ),br(),
+                        #         fluidRow(
+                        #           column(3,offset=4,actionButton("go2","Go to the overview",icon("bolt"),style='padding:10px; font-size:100%',class="circle grow"))
+                        #         )
+                        #         
+                        #         
+                        # ),
                         
                         
                        
