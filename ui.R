@@ -20,125 +20,122 @@ convertMenuItem <- function(mi,tabName) {
   mi
 }
 
-shinyUI(fluidPage(
-        dashboardPage(skin = "black",
-                      dashboardHeader(title = "ANCOVA",
-                                    titleWidth = 180,
-                                    tags$li(class = "dropdown", tags$a(href='https://shinyapps.science.psu.edu/',icon("home"))),
-                                    tags$li(class = "dropdown", actionLink("info",icon("info",class="myClass")))
-                                    # Set height of dashboardHeader
-                                    # tags$li(class = "dropdown",
-                                    #         tags$style(".main-header {max-height: 45px}"),
-                                    #         tags$style(".main-header .logo {height: 45px;}"),
-                                    #         tags$style(".sidebar-toggle {height: 45px; padding-top: 1px !important;}"),
-                                    #         tags$style(".navbar {min-height:45px !important}")
-                                    # ) 
-                                    
-                    ),
-                    #adding prereq pages
-                    dashboardSidebar(
-                      width = 180,
-                      
-                      sidebarMenu(id='tabs',style='font-size:13px;',
-                                  convertMenuItem(menuItem("Pre-requisites", tabName= "prereq", icon=icon("book"),
-                                                           menuSubItem('What is ANCOVA',tabName = 'box',icon=icon('calendar'))),'prereq'),
-                                  menuItem("Overview",tabName = "instruction", icon = icon("dashboard")),
-                                  menuItem("Exploring",tabName = "exploring", icon = icon("wpexplorer")),
-                                  menuItem("Game",tabName = "game", icon = icon("gamepad"))
-                      )
-                    ),
-                    dashboardBody(
-                      tags$head(
-                        tags$link(rel = "stylesheet", type = "text/css", href = "navcolor.css") #customised style sheet
-                      ),
-                      tags$head(
-                        tags$style(".fa-home {color:#FFFFFF}"),
-                        tags$style(".fa-info {color:#FFFFFF}"),
-                        tags$style(HTML('#start{color:white;background-color: #BB8FCE}')),
-                        tags$style(HTML('#go{color:white;background-color: #BB8FCE}')),
-                        tags$style(HTML('#go2{color:white;background-color: #BB8FCE}')),
-                        tags$style(HTML('#game{color:white;background-color: #BB8FCE}')),
-                        tags$style(HTML('#pre2{color:white;background-color: #BB8FCE}')),
-                        tags$style(HTML('#submitA{color:white;background-color: #BB8FCE}')),
-                        tags$style(HTML('#new{color:white;background-color: #BB8FCE}')),
-                        tags$style(HTML('#start_timer{color:white;background-color: #BB8FCE}')),
-                        tags$style(HTML('#set{color:white;background-color: #BB8FCE}')),
-                        tags$style(HTML('#reset{color:white;background-color: #BB8FCE}')),
-                        tags$head(tags$style(HTML("
-                                                  #analysis1 {
-                                                  font-size: 14px;
-                                                  background-color: #F5EEF8   
-                                                  }
-                                                  "))),
-                        # tags$head(tags$style(HTML("
-                        #     #p {font-size: 8px;
-                        #         padding-left: 5px"))),
-                        
-                        tags$style(type='text/css', '#timeleft {background-color:#BB8FCE; font-size: 18px; 
-                                   color:white;font-weight: bold;font family:Sans-serif;text-align: center; border-radius: 100px}'),
-                        tags$style(type='text/css', '#a {background-color:#C39BD3; font-size: 12px; 
-                                   color:white;font-weight: bold;font family:Sans-serif;text-align: center; border-radius: 80px}'),
-                        tags$style(type='text/css', '#b {background-color:#C39BD3; font-size: 12px; 
-                                   color:white;font-weight: bold;font family:Sans-serif;text-align: center; border-radius: 80px}'),
-                        tags$style(type='text/css', '#c {background-color:#C39BD3; font-size: 12px; 
-                                   color:white;font-weight: bold;font family:Sans-serif;text-align: center; border-radius: 80px}'),
-                        
-                        
-                        ###format for the pre-req
-                        tags$style(type='text/css', '#ano {background-color:#900C3F; font-size: 24px; padding:10px;height:180px; width:370px;
-                                   color:white;font family:Sans-serif;text-align: center; border-radius: 80px}'),
-                        
-                        tags$style(type='text/css', '#regression {background-color:#C70039; font-size: 24px; padding:10px;height:180px; width:370px;
-                                   color:white;font family:Sans-serif;text-align: center; border-radius: 80px}'),
-                        
-                        tags$style(type='text/css', '#anc {background-color:#FF5733; font-size: 24px;padding:10px;height:180px; width:370px;
-                                   color:white;font family:Sans-serif;text-align: center; border-radius: 80px}'),
-                        
-                        tags$style(type='text/css', '#box1 {background-color:#F36DA1; font-size: 26px; padding:20px;height:180px; width:520px;
-                                   color:white;font-weight: bold;font family:Sans-serif;text-align: center; border-radius: 80px}'),
-                        
-                        tags$style(type='text/css', '#box2 {background-color:#FFB3C9; font-size: 26px; padding:20px;height:180px; width:520px;
-                                   color:white;font-weight: bold;font family:Sans-serif;text-align: center; border-radius: 80px}'),
-                        
-                        tags$style(type='text/css', '#box3 {background-color:#FF9881; font-size: 26px;padding:20px;height:180px; width:520px;
-                                   color:white;font-weight: bold;font family:Sans-serif;text-align: center; border-radius: 80px}'),
-                        tags$style(
-                          HTML(".shiny-notification {
-                               height: 100px;
-                               width: 800px;
-                               position:fixed;
-                               top: calc(50% - 50px);;
-                               left: calc(50% - 400px);;
-                               }
-                               "
-                          )
-                          )
-                        
+shinyUI(list(
+        dashboardPage(
+          skin = "black", 
+          dashboardHeader(title = "ANCOVA",
+                          titleWidth = 250,
+                          tags$li(
+                            class = "dropdown",
+                            actionLink("info",
+                                       icon("info"))
                           ),
+                          tags$li(
+                            class = "dropdown",
+                            tags$a(target = "_blank", 
+                                   icon("comments"),
+                                   href = "https://pennstate.qualtrics.com/jfe/form/SV_7TLIkFtJEJ7fEPz?appName=ANCOVA"
+                            )
+                          ),
+                          tags$li(
+                            class = "dropdown",
+                            tags$a(icon("home"),
+                                   href = 'https://shinyapps.science.psu.edu/'
+                            )
+                            )
+                          ),
+          #adding pages to sidebar
+          dashboardSidebar(
+            width = 220,
+            sidebarMenu(id = "pages",
+              menuItem(text = "Overview",
+                       tabName = "instruction", 
+                       icon = icon("dashboard")
+              ),
+              menuItem(text = "Prerequisites", 
+                       tabName = "prereq", 
+                       icon = icon("book")
+              ),
+              menuItem(text = "Explore",
+                       tabName = "explore", 
+                       icon = icon("wpexplorer")
+              ),
+              menuItem(text = "Game", 
+                       tabName = "qqq", 
+                       icon = icon("gamepad")
+              ),
+              menuItem(text = "References",
+                       tabName = "refs",
+                       icon = icon("leanpub")
+              )
+            ),
+            tags$div(
+              class = "sidebar-logo", 
+              boastUtils::sidebarFooter()
+            )
+          ),
+          dashboardBody(
+            tabItems(
+              tabItem(tabName = "instruction",
+                      h1("ANCOVA"),
+                      h2("About:"),
+                      h4('This app introduces the concept of ANCOVA focusing on 
+                         interpreting interaction plots.'),
+                      br(),
+                      h2('Instructions:'),
+                      h4(
+                        tags$li('Click Go button to enter the explore page. Use 
+                                the dropdown menu to select a dataset.')
+                        ),
+                      h4(
+                        tags$li('Use the radio buttons to select different variables 
+                                and see the changes in the interaction plot. Or 
+                                use slider bars to change the parameters. ')
+                        ),
+                      h4(
+                        tags$li('After working with the explore section, you can 
+                                start the matching game to test your understanding 
+                                of the concepts. Click "start" to set the timer 
+                                and start the game. You can use "i" button for 
+                                instruction and "?" for hints.')
+                        ),
+                      div(style = "text-align: center",
+                          bsButton(inputId = "go",
+                                   label = "Prerequisites",
+                                   icon = icon("book"),
+                                   style = "danger",
+                                   size = "large")
+                          ),
+                      br(),
+                      h2('Acknowledgements:'),
+                      h4("This app was developed and coded by Luxin Wang and
+                         modified by Zhiruo Wang and Lydia Bednarczyk.")
+                      ),
+      #Adding prerequisites page
+              tabItem(tabName="prereq",
+                      h3(strong('Background')),
+                      h3('What is ANCOVA:'),
+                      h4('Analysis of variance with continuous variables added in. To know more about the difference between ANOVA, Regression, and ANCOVA, click'),
+                      br(),
+                      div(style = "text-align: center",
+                          actionButton('pre2','Comparision of different analysis',class="circle grow")),
                       
+                      h3('Diagnostic Plots:'),
+                      fluidRow(column(11,offset=2, img(src='plot.png',width=550),style='margin-top:-1em')),
+                      h4('Model checking is a critical part of an analysis. You need to understand the diagnostic plot s like these four:',br(),
+                         tags$li('The Residuals vs Fitted plot checks linear pattern of residuals. If the liner model is correct, you should expect a roughly horizontal line.'), br(),
+                         tags$li('The Normal Q-Q plot checks normality. If the normality assumption is true, you should expect the dots roughly follow a straight line.'),br(),
+                         tags$li('The Scale-Location plot checks for equal spread of residual the residuals. If the equal variance assumption is true, you should expect a roughly horizontal line with the dots showing equal spread.'),br(),
+                         tags$li('The Residual vs Leverage plot checks for influential outliers. Outliers with high leverage will appear outside the dashed line range.')),
                       
-                      
-                      tabItems(
+                      div(style = "text-align: center",
+                          actionButton("start","Go to the overview",icon("bolt"),style='padding:10px; font-size:100%',class="circle grow"))
+              ),
+              
+              
+              
+              
                         
-                        tabItem(tabName="prereq",
-                                h3(strong('Background')),
-                                h3('What is ANCOVA:'),
-                                h4('Analysis of variance with continuous variables added in. To know more about the difference between ANOVA, Regression, and ANCOVA, click'),
-                                br(),
-                                div(style = "text-align: center",
-                                    actionButton('pre2','Comparision of different analysis',class="circle grow")),
-                                
-                                h3('Diagnostic Plots:'),
-                                fluidRow(column(11,offset=2, img(src='plot.png',width=550),style='margin-top:-1em')),
-                                h4('Model checking is a critical part of an analysis. You need to understand the diagnostic plot s like these four:',br(),
-                                   tags$li('The Residuals vs Fitted plot checks linear pattern of residuals. If the liner model is correct, you should expect a roughly horizontal line.'), br(),
-                                   tags$li('The Normal Q-Q plot checks normality. If the normality assumption is true, you should expect the dots roughly follow a straight line.'),br(),
-                                   tags$li('The Scale-Location plot checks for equal spread of residual the residuals. If the equal variance assumption is true, you should expect a roughly horizontal line with the dots showing equal spread.'),br(),
-                                   tags$li('The Residual vs Leverage plot checks for influential outliers. Outliers with high leverage will appear outside the dashed line range.')),
-                                
-                                div(style = "text-align: center",
-                                    actionButton("start","Go to the overview",icon("bolt"),style='padding:10px; font-size:100%',class="circle grow"))
-                               ),
                         
                         tabItem(tabName='box',
                                 br(),
@@ -183,26 +180,7 @@ shinyUI(fluidPage(
                         ),
                         
                         
-                        tabItem(tabName = "instruction",
-                                tags$a(href='http://stat.psu.edu/',tags$img(src='logo.png', align = "left", width = 180)),
-                                br(),br(),br(),
-                                h3(strong("About:")),
-                                h4('This app introduces the concept of ANCOVA focusing on interpreting interaction plots.'),
-                                br(),
-                                h3(strong('Instructions:')),
-                                h4(tags$li('Click Go button to enter the explore page. Use the dropdown menu to select a dataset.')),
-                                h4(tags$li('Use the radio buttons to select different variables and see the changes in the interaction plot. Or use slider bars to change the parameters. ')),
-                                h4(tags$li('After working with the explore section, you can start the matching game to test your understanding of the concepts. Click "start" to set the timer and start the game. You can use "i" button for instruction and "?" for hints.')),
-                                
-                                div(style = "text-align: center",
-                                    actionButton("go","G O !",icon("bolt"),class="circle grow")),
-                                br(),
-                                h3(strong('Acknowledgements:')),
-                                h4("This app was developed and coded by Luxin Wang."),
-                                uiOutput("ack2"),
-                                h4("This application was modified by Zhiruo Wang.")
-                                
-                        ),
+                       
                         
                         
                         
