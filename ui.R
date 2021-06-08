@@ -185,7 +185,7 @@ shinyUI(list(
                         column(
                           width = 6,
                           offset = 0,
-                          h4("ANCOVA is adding continuous variables onto ANOVA 
+                          h4("ANCOVA is used by adding continuous variables onto ANOVA 
                              analysis, which is called covariate.",
                              tags$br(),
                              "Significant differences between group means, and 
@@ -196,18 +196,51 @@ shinyUI(list(
                              years after graduation influence the income?")
                         )
                       ),
-                      
                       h3('Diagnostic Plots:'),
-                      fluidRow(column(11,offset=2, img(src='plot.png',width=550),style='margin-top:-1em')),
-                      h4('Model checking is a critical part of an analysis. You need to understand the diagnostic plot s like these four:',br(),
-                         tags$li('The Residuals vs Fitted plot checks linear pattern of residuals. If the liner model is correct, you should expect a roughly horizontal line.'), br(),
-                         tags$li('The Normal Q-Q plot checks normality. If the normality assumption is true, you should expect the dots roughly follow a straight line.'),br(),
-                         tags$li('The Scale-Location plot checks for equal spread of residual the residuals. If the equal variance assumption is true, you should expect a roughly horizontal line with the dots showing equal spread.'),br(),
-                         tags$li('The Residual vs Leverage plot checks for influential outliers. Outliers with high leverage will appear outside the dashed line range.')),
-                      
+                      fluidRow(
+                        column(
+                          width = 11,
+                          offset = 2,
+                          tags$figure(
+                            align = "center",
+                            tags$img(
+                              src = "plot.png",
+                              width = 550,
+                              alt = "Picture of diagnostic plots"
+                            ),
+                            tags$figcaption("Image of four diagnostic plots.")
+                          )
+                          ),
+                      h4('Model checking is a critical part of an analysis. You 
+                         need to understand these four diagnostic plots:',
+                         br(),
+                         br(),
+                         tags$li('The Residuals vs Fitted plot checks the linear 
+                         pattern of residuals. If the linear model is correct, you 
+                                 should expect a roughly horizontal line.'), 
+                         br(),
+                         tags$li('The Normal Q-Q plot checks normality. If the 
+                                 normality assumption is true, you should expect 
+                                 the dots to roughly follow a straight line.'),
+                         br(),
+                         tags$li('The Scale-Location plot checks for equal spread 
+                                 of the residuals. If the equal variance assumption 
+                                 is true, you should expect a roughly horizontal 
+                                 line with the dots showing equal spread.'),
+                         br(),
+                         tags$li('The Residual vs Leverage plot checks for influential 
+                                 outliers. Outliers with high leverage will appear 
+                                 outside the dashed line range.')
+                         ),
                       div(style = "text-align: center",
-                          actionButton("start","Go to the overview",icon("bolt"),style='padding:10px; font-size:100%',class="circle grow"))
-              ),
+                         bsButton(inputId = "start",
+                                  label = "Explore!",
+                                  icon = icon("bolt"),
+                                  style = "danger",
+                                  size = "large")
+                      )
+                      )
+                      ),
               
               
               
