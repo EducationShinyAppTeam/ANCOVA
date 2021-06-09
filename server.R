@@ -27,170 +27,259 @@ bank = data.frame(lapply(bank, as.character), stringsAsFactors = FALSE)
 
 shinyServer(function(input, output,session) {
 
-  observeEvent(input$info,{
+  observeEvent(
+    eventExpr = input$info,
+    handlerExpr = {
     sendSweetAlert(
       session = session,
       title = "Instructions:",
       type = NULL,
       closeOnClickOutside = TRUE,
-      text = "Pick a data set and variables to view the interaction plot and the associated ANOVA table."
+      text = "Pick a data set and variables to view the interaction plot and the 
+      associated ANOVA table."
     )
   })
-  output$ack2<-renderUI((
-    h4('Thanks for the data set and code provided by The University of Sheffield (',url,') and Dr.Dylan Childs(',url2,').')
+  output$ack2 <- renderUI((
+    h4('Thanks for the data set and code provided by The University of Sheffield 
+       (',url,') and Dr.Dylan Childs(',url2,').')
   ))
   
-  url <- a("www.sheffield.ac.uk/mash/data", href="https://www.sheffield.ac.uk/mash/data",target="_blank")
-  url2 <- a("github.com/dzchilds", href="https://github.com/dzchilds",target="_blank")
+  url <- a("www.sheffield.ac.uk/mash/data", 
+           href="https://www.sheffield.ac.uk/mash/data",
+           target="_blank")
+  url2 <- a("github.com/dzchilds", 
+            href="https://github.com/dzchilds",
+            target="_blank")
   
   
-  
-  
-  
-  output$box1<-renderUI(h4('ANOVA is used for comparing three or more group means. 
-                           Different groups are different levels of categorical variables, and group means are calculated from continuous variables.
-                           ',br(),br(),'EX. Are the average score of three STAT 200 sections significantly different from each other?'))
-  
-  output$box2<-renderUI(h4('Regression is used for determining the relationship between two continuous variables. One dependent variable (Y) can also be affected by multiple independent variables (X).  
-                           ',br(),br(),'EX. How will crime rate be impacted by population density, unemployment rate, and income.'))
-  
-  output$box3<-renderUI(h4('ANCOVA is adding continuous variables onto ANOVA analysis, which is called covariate. 
-                           Significant different between group means and significant relationship between continuous variables will both be analyzed.
-                           ',br(),br(),'EX. Who makes the most money? Will gender or years after graduation influence the income? '))
+  # output$box1<-renderUI(h4('ANOVA is used for comparing three or more group means. 
+  #                          Different groups are different levels of categorical variables, 
+  #                          and group means are calculated from continuous variables.',
+  #                          br(),
+  #                          br(),
+  #                          'EX. Are the average score of three STAT 200 sections significantly different from each other?'))
+  # 
+  # output$box2<-renderUI(h4('Regression is used for determining the relationship between two continuous variables. One dependent variable (Y) can also be affected by multiple independent variables (X).  
+  #                          ',br(),br(),'EX. How will crime rate be impacted by population density, unemployment rate, and income.'))
+  # 
+  # output$box3<-renderUI(h4('ANCOVA is adding continuous variables onto ANOVA analysis, which is called covariate. 
+  #                          Significant different between group means and significant relationship between continuous variables will both be analyzed.
+  #                          ',br(),br(),'EX. Who makes the most money? Will gender or years after graduation influence the income? '))
   
   ####button###
   
-  observeEvent(input$go,{
-    updateTabItems(session,"tabs","exploring")
+  observeEvent(
+    eventExpr = input$go,
+    handlerExpr = {
+    updateTabItems(
+      session = session,
+      inputId = "pages",
+      selected = "prereq")
+  })
+  observeEvent(
+    eventExpr = input$start,
+    handlerExpr = {
+    updateTabItems(
+      session = session,
+      inputId = "pages",
+      selected = "exploring")
+  })
+  observeEvent(
+    eventExpr = input$game,
+    handlerExpr = {
+    updateTabItems(
+      session = session,
+      inputId = "pages",
+      selected = "game")
   })
   
-  observeEvent(input$game,{
-    updateTabItems(session,"tabs","game")
-  })
-  
-  observeEvent(input$pre2,{
-    updateTabItems(session,"tabs","box")
-  })
-  
-  observeEvent(input$go2,{
-    updateTabItems(session,"tabs","instruction")
-  })
-  
-  
-  observeEvent(input$start,{
-    updateTabItems(session,"tabs","instruction")
-  })
-  
-  
-  
-  ##########################Download the dataset#################
+  #Download the dataset ----
   
   # Reactive value for selected dataset ----
   datasetInput <- reactive({
-    switch(input$menu1,
-           'Otter'=seaotters,
-           'Diet'=diet)
+    switch(
+      EXPR = input$menu1,
+      'Otter' = seaotters,
+      'Diet' = diet)
   })
   
   # Downloadable csv of selected dataset ----
   
   output$downloadData <- downloadHandler(
     filename = function() {
-      paste(input$menu1, ".csv", sep = "")
+      paste(input$menu1, 
+            ".csv", 
+            sep = "")
     },
     content = function(con) {
-      write.csv(datasetInput(), con)
+      write.csv(datasetInput(), 
+                con)
     }
   )
   
-  
-  
-  ###############################  Exploring  ##############################
+
+  #Explore page ----
   
   
   ###prep the data###
-  otters.model <- lm(Otters ~ Location + Year + Location:Year, data = seaotters)
-  pred.data <- expand.grid(Year = 1992:2003, Location = c("Lagoon", "Bay"))
-  pred.data <- mutate(pred.data, Otters = predict(otters.model, pred.data))
+  otters.model <- lm(Otters ~ Location + Year + Location:Year, 
+                     data = seaotters)
+  pred.data <- expand.grid(Year = 1992:2003, 
+                           Location = c("Lagoon", "Bay"))
+  pred.data <- mutate(pred.data, 
+                      Otters = predict(otters.model, pred.data))
   
-  diet.model<-lm(ab_change~gender+Diet+Age+Height+pre.weight+gender:Age+gender:Height+gender:pre.weight+
-                   Diet:Age+Diet:Height+Diet:pre.weight,data=diet)
+  diet.model<-lm(ab_change ~ gender + Diet + Age + Height + pre.weight + gender:Age 
+                 + gender:Height + gender:pre.weight + Diet:Age + Diet:Height + 
+                   Diet:pre.weight,
+                 data = diet)
   
-  diet.model2<-lm(ab_change~Age+gender+Age:gender,data=diet)
+  diet.model2<-lm(ab_change ~ Age + gender + Age:gender,
+                  data=diet)
   pred.data2 <- expand.grid(Age = 16:60, gender = c("M", "F"))
   pred.data2 <- mutate(pred.data2, ab_change = predict(diet.model2, pred.data2))
   
-  diet.model3<-lm(ab_change~Height+gender+Height:gender,data=diet)
+  diet.model3 <- lm(ab_change ~ Height + gender + Height:gender,
+                    data=diet)
   pred.data3 <- expand.grid(Height = 141:201, gender = c("M", "F"))
   pred.data3 <- mutate(pred.data3, ab_change = predict(diet.model3, pred.data3))
   
-  
-  diet.model4<-lm(ab_change~pre.weight+gender+pre.weight:gender,data=diet)
-  pred.data4 <- expand.grid(pre.weight=58:103, gender = c("M", "F"))
+  diet.model4 <- lm(ab_change ~ pre.weight + gender + pre.weight:gender,
+                    data=diet)
+  pred.data4 <- expand.grid(pre.weight = 58:103, gender = c("M", "F"))
   pred.data4 <- mutate(pred.data4, ab_change = predict(diet.model4, pred.data4))
   
-  
-  diet.model5<-lm(ab_change~Age+Diet+Age:Diet,data=diet)
+  diet.model5 <- lm(ab_change ~ Age + Diet + Age:Diet,
+                    data=diet)
   pred.data5 <- expand.grid(Age = 16:60, Diet = c('1','2','3'))
   pred.data5 <- mutate(pred.data5, ab_change = predict(diet.model5, pred.data5))
   
-  diet.model6<-lm(ab_change~Height+Diet+Height:Diet,data=diet)
-  pred.data6<- expand.grid(Height = 141:201, Diet = c('1','2','3'))
+  diet.model6 <- lm(ab_change ~ Height + Diet + Height:Diet,
+                    data=diet)
+  pred.data6 <- expand.grid(Height = 141:201, Diet = c('1','2','3'))
   pred.data6 <- mutate(pred.data6, ab_change = predict(diet.model6, pred.data6))
   
   
-  diet.model7<-lm(ab_change~pre.weight+Diet+pre.weight:Diet,data=diet)
-  pred.data7 <- expand.grid(pre.weight=58:103, Diet = c('1','2','3'))
+  diet.model7 <- lm(ab_change ~ pre.weight + Diet + pre.weight:Diet,
+                    data = diet)
+  pred.data7 <- expand.grid(pre.weight = 58:103, Diet = c('1','2','3'))
   pred.data7 <- mutate(pred.data7, ab_change = predict(diet.model7, pred.data7))
   
   
   ###save random model
   rand<-reactiveValues(rand_mod=NULL)
   
-  
-  
   ###Graph the plot of interaction###
   
-  
-  output$plot_gg<-renderPlot(
-    if (input$menu1=='Otter') {ggplot(pred.data, aes(x = Year, y = Otters, colour = Location)) + 
-        geom_line() + geom_point(data = seaotters) + 
-        xlab("Year") + ylab("Otters")+theme(text = element_text(size=20),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                            panel.background = element_blank(), axis.line = element_line(colour = "black"))}
-    
-    else if (input$menu1=='Diet'){
-      
-      
-      if (input$select_conti=='Age' & input$select_covar=='Gender'){ggplot(pred.data2, aes(x = Age, y = ab_change, colour = gender)) + 
-          geom_line() + geom_point(data = diet) + 
-          xlab("Age") + ylab("Decrease in Weight")+theme(text = element_text(size=20),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                         panel.background = element_blank(), axis.line = element_line(colour = "black"))}
-      else if (input$select_conti=='Height' & input$select_covar=='Gender'){ggplot(pred.data3, aes(x = Height, y = ab_change, colour = gender)) + 
-          geom_line() + geom_point(data = diet) + 
-          xlab("Height") + ylab("Decrease in Weight")+theme(text = element_text(size=20),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                            panel.background = element_blank(), axis.line = element_line(colour = "black"))}
-      else if (input$select_conti=='Pre-diet Weight' & input$select_covar=='Gender'){ggplot(pred.data4, aes(x = pre.weight, y = ab_change, colour = gender)) + 
-          geom_line() + geom_point(data = diet) + 
-          xlab("Pre-diet Weight") + ylab("Decrease in Weight")+theme(text = element_text(size=20),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                                     panel.background = element_blank(), axis.line = element_line(colour = "black"))}
-      else if (input$select_conti=='Age' & input$select_covar=='Diet'){ggplot(pred.data5, aes(x = Age, y = ab_change, colour =Diet)) + 
-          geom_line() + geom_point(data = diet) + 
-          xlab("Age") + ylab("Decrease in Weight")+theme(text = element_text(size=20),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                         panel.background = element_blank(), axis.line = element_line(colour = "black"))}
-      else if (input$select_conti=='Height' & input$select_covar=='Diet'){ggplot(pred.data6, aes(x = Height, y = ab_change, colour = Diet)) + 
-          geom_line() + geom_point(data = diet) + 
-          xlab("Height") + ylab("Decrease in Weight")+theme(text = element_text(size=20),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                            panel.background = element_blank(), axis.line = element_line(colour = "black"))}
-      else if (input$select_conti=='Pre-diet Weight' & input$select_covar=='Diet'){ggplot(pred.data7, aes(x = pre.weight, y = ab_change, colour = Diet)) + 
-          geom_line() + geom_point(data = diet) + 
-          xlab("Pre-diet Weight") + ylab("Decrease in Weight")+theme(text = element_text(size=20),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                                     panel.background = element_blank(), axis.line = element_line(colour = "black"))}
-      
+  output$plot_gg <- renderPlot(
+    if (input$menu1 == 'Otter') {
+      ggplot(pred.data, 
+             aes(x = Year, 
+                 y = Otters, 
+                 colour = Location)) +
+        geom_line() + 
+        geom_point(data = seaotters) + 
+        xlab("Year") + 
+        ylab("Otters") +
+        theme(text = element_text(size = 20),
+              panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank(),
+              panel.background = element_blank(), 
+              axis.line = element_line(colour = "black"))
+      }
+    else if (input$menu1 == 'Diet') {
+      if (input$select_conti == 'Age' & input$select_covar == 'Gender') {
+        ggplot(pred.data2, 
+               aes(x = Age, 
+                   y = ab_change, 
+                   colour = gender)) + 
+          geom_line() + 
+          geom_point(data = diet) + 
+          xlab("Age") + 
+          ylab("Decrease in Weight") +
+          theme(text = element_text(size=20),
+                panel.grid.major = element_blank(), 
+                panel.grid.minor = element_blank(),
+                panel.background = element_blank(), 
+                axis.line = element_line(colour = "black"))
+      }
+      else if (input$select_conti == 'Height' & input$select_covar == 'Gender') {
+        ggplot(pred.data3, 
+               aes(x = Height, 
+                   y = ab_change, 
+                   colour = gender)) + 
+          geom_line() + 
+          geom_point(data = diet) + 
+          xlab("Height") + 
+          ylab("Decrease in Weight") +
+          theme(text = element_text(size=20),
+                panel.grid.major = element_blank(), 
+                panel.grid.minor = element_blank(),
+                panel.background = element_blank(), 
+                axis.line = element_line(colour = "black"))
+      }
+      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Gender') {
+        ggplot(pred.data4, 
+               aes(x = pre.weight, 
+                   y = ab_change, 
+                   colour = gender)) + 
+          geom_line() + 
+          geom_point(data = diet) + 
+          xlab("Pre-diet Weight") + 
+          ylab("Decrease in Weight") +
+          theme(text = element_text(size=20),
+                panel.grid.major = element_blank(), 
+                panel.grid.minor = element_blank(),
+                panel.background = element_blank(), 
+                axis.line = element_line(colour = "black"))
+      }
+      else if (input$select_conti == 'Age' & input$select_covar=='Diet') {
+        ggplot(pred.data5, 
+               aes(x = Age, 
+                   y = ab_change, 
+                   colour =Diet)) + 
+          geom_line() + 
+          geom_point(data = diet) + 
+          xlab("Age") + 
+          ylab("Decrease in Weight") +
+          theme(text = element_text(size=20),
+                panel.grid.major = element_blank(), 
+                panel.grid.minor = element_blank(),
+                panel.background = element_blank(), 
+                axis.line = element_line(colour = "black"))
+        }
+      else if (input$select_conti == 'Height' & input$select_covar == 'Diet') {
+        ggplot(pred.data6, 
+               aes(x = Height, 
+                   y = ab_change, 
+                   colour = Diet)) + 
+          geom_line() + 
+          geom_point(data = diet) + 
+          xlab("Height") + 
+          ylab("Decrease in Weight") +
+          theme(text = element_text(size=20),
+                panel.grid.major = element_blank(), 
+                panel.grid.minor = element_blank(),
+                panel.background = element_blank(), 
+                axis.line = element_line(colour = "black"))
+        }
+      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Diet') {
+        ggplot(pred.data7, 
+               aes(x = pre.weight, 
+                   y = ab_change, 
+                   colour = Diet)) + 
+          geom_line() + 
+          geom_point(data = diet) + 
+          xlab("Pre-diet Weight") + 
+          ylab("Decrease in Weight") +
+          theme(text = element_text(size=20),
+                panel.grid.major = element_blank(), 
+                panel.grid.minor = element_blank(),
+                panel.background = element_blank(), 
+                axis.line = element_line(colour = "black"))
+        }
     }
-    
     else if (input$menu1=='Random'){
-      
-      
       ###create data with label A and B with different slope and intersection
       A<-'A'
       B<-'B'
