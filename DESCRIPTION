@@ -1,0 +1,22 @@
+Title: ANCOVA
+ShortName: ANCOVA
+Date: 2021-05-13
+Lifecycle: experimental
+Authors@R: c(
+    person(given = "Luxin", family = "Wang", role = c("aut", "cre")),
+    person(given = "Zhiruo", family = "Wang", role = c("aut")),
+    person(given = "Lydia", family = "Bednarczyk", email = "ljb5670@psu.edu", role = c("aut"))
+  )
+Chapter: Chapter 7
+Description: This app introduces the concept of ANCOVA focusing on interpreting 
+interaction plots.
+LearningObjectives: c(
+    "The student will learn to how to interpret interaction plots in order to determine
+    if interaction terms are significant."
+  )
+DisplayMode: Normal
+URL: https://psu-eberly.shinyapps.io/ANCOVA
+BugReports: https://github.com/EducationShinyAppTeam/ANCOVA/issues
+License: CC-BY-NC-SA-4.0
+Tags: simulation
+Type: Shiny
