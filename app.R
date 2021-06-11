@@ -1408,10 +1408,10 @@ server <- function(input, output, session) {
   
   
   
-  ######################################  Bank B #############################################################
+  #  Bank B ----
   numbers <- reactiveValues(strong = c(), moderate = c(), insig = c(), index = c(), question = data.frame())
   
-  observeEvent(input$go,{
+  observeEvent(input$pages,{
     numbers$strong = sample(1:12,1)
     numbers$moderate = sample(13:24,1)
     numbers$insig= sample(25:36,1)
@@ -1436,16 +1436,16 @@ server <- function(input, output, session) {
     updateRadioButtons(session, "radio3", '',c('A','B','C'),selected='',inline=TRUE)
   })
   
-  observeEvent(input$tabs,{
-    numbers$strong = sample(1:12,1)
-    numbers$moderate = sample(13:24,1)
-    numbers$insig= sample(25:36,1)
-    
-    
-    numbers$index = c("A","B","C")
-    numbers$question = cbind(bank[c(numbers$strong,numbers$moderate,numbers$insig),],numbers$index)
-    
-  })
+  # observeEvent(input$tabs,{
+  #   numbers$strong = sample(1:12,1)
+  #   numbers$moderate = sample(13:24,1)
+  #   numbers$insig= sample(25:36,1)
+  #   
+  #   
+  #   numbers$index = c("A","B","C")
+  #   numbers$question = cbind(bank[c(numbers$strong,numbers$moderate,numbers$insig),],numbers$index)
+  #   
+  # })
   
   output$plot1 <- renderUI({
     img(src = numbers$question[numbers$question[5] == "A",4], width = "100%", height = "107%", style = "text-align: center")
