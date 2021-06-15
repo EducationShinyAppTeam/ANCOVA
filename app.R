@@ -129,10 +129,10 @@ ui <- list(
                     h4("X: Categorical", tags$br(),"Y: Continuous")
                   ),
                   column(
-                    width = 2,
+                    width = 1,
                     offset = 0,
-                    h4("------->")
-                    
+                    fa("long-arrow-alt-right",
+                       width = "5em")
                   ),
                   column(
                     width = 6,
@@ -148,6 +148,8 @@ ui <- list(
                              from each other?")
                   )
                 ),
+                br(),
+                br(),
                 fluidRow(
                   column(
                     width = 2,
@@ -155,10 +157,10 @@ ui <- list(
                     h4("X: Continuous", tags$br(),"Y: Continuous")
                   ),
                   column(
-                    width = 2,
+                    width = 1,
                     offset = 0,
-                    h4("------->")
-                    
+                    fa("long-arrow-alt-right",
+                       width = "5em")
                   ),
                   column(
                     width = 6,
@@ -173,6 +175,8 @@ ui <- list(
                              density, unemployment rate, and income?")
                   )
                 ),
+                br(),
+                br(),
                 fluidRow(
                   column(
                     width = 2,
@@ -180,10 +184,10 @@ ui <- list(
                     h4("X: Categorical & Continuous", tags$br(),"Y: Continuous")
                   ),
                   column(
-                    width = 2,
+                    width = 1,
                     offset = 0,
-                    h4("------->")
-                    
+                    fa("long-arrow-alt-right",
+                       width = "5em")
                   ),
                   column(
                     width = 6,
@@ -200,40 +204,64 @@ ui <- list(
                   )
                 ),
                 h3('Diagnostic Plots:'),
-                fluidRow(
-                  column(
-                    width = 11,
-                    offset = 2,
-                    tags$figure(
-                      align = "center",
-                      tags$img(
-                        src = "plot.png",
-                        width = 550,
-                        alt = "Picture of diagnostic plots"
-                      ),
-                      tags$figcaption("Image of four diagnostic plots.")
-                    )
-                  ),
+                #fluidRow(
                   h4('Model checking is a critical part of an analysis. You 
                          need to understand these four diagnostic plots:',
                      br(),
                      br(),
+                     tags$ul(
                      tags$li('The Residuals vs Fitted plot checks the linear 
                          pattern of residuals. If the linear model is correct, you 
-                                 should expect a roughly horizontal line.'), 
+                                 should expect a roughly horizontal line.'),
+                       tags$figure(
+                         align = "center",
+                         tags$img(
+                           src = "residualsvsfitted.png",
+                           width = 550,
+                           alt = "Picture of residuals vs fitted plot"
+                         ),
+                         tags$figcaption("Image of residuals vs fitted plot.")
+                       ),
                      br(),
                      tags$li('The Normal Q-Q plot checks normality. If the 
                                  normality assumption is true, you should expect 
                                  the dots to roughly follow a straight line.'),
+                     tags$figure(
+                       align = "center",
+                       tags$img(
+                         src = "normalqq.png",
+                         width = 550,
+                         alt = "Picture of normal QQ plot"
+                       ),
+                       tags$figcaption("Image of normal Q-Q plot.")
+                     ),
                      br(),
                      tags$li('The Scale-Location plot checks for equal spread 
                                  of the residuals. If the equal variance assumption 
                                  is true, you should expect a roughly horizontal 
                                  line with the dots showing equal spread.'),
+                     tags$figure(
+                       align = "center",
+                       tags$img(
+                         src = "scalelocation.png",
+                         width = 550,
+                         alt = "Picture of a scale location plot"
+                       ),
+                       tags$figcaption("Image of scale location plot.")
+                     ),
                      br(),
                      tags$li('The Residual vs Leverage plot checks for influential 
                                  outliers. Outliers with high leverage will appear 
-                                 outside the dashed line range.')
+                                 outside the dashed line range.'),
+                     tags$figure(
+                       align = "center",
+                       tags$img(
+                         src = "residualsvsleverage.png",
+                         width = 550,
+                         alt = "Picture of residuals vs leverage plot"
+                       ),
+                       tags$figcaption("Image of residuals vs leverage plot.")
+                     )),
                   ),
                   div(style = "text-align: center",
                       bsButton(inputId = "start",
@@ -242,7 +270,7 @@ ui <- list(
                                style = "danger",
                                size = "large")
                   )
-                )
+               # )
         ),
         
         
@@ -391,7 +419,12 @@ ui <- list(
                   
                   mainPanel(
                     plotOutput('plot_gg'),
-                    bsPopover('plot_gg', 'Notice', 'Different lines represent different values of covariate. Remember intersection does not imply significant interaction.', placement = "bottom", trigger = "hover", options = NULL),
+                    bsPopover('plot_gg', 
+                  'Notice', 'Different lines represent 
+                              different values of covariate. Remember intersection 
+                              does not imply significant interaction.', 
+                              placement = "bottom", 
+                              trigger = "hover", options = NULL),
                     tags$b(verbatimTextOutput('analysis1')),
                     bsPopover('analysis1', 'ANOVA Table', 'Pay attention to the last column. Small p-value indicates siginificant influence or interaction.', placement = "top", trigger = "hover", options = NULL),
                     
@@ -412,8 +445,10 @@ ui <- list(
         
         tabItem(tabName='game',
                 h2("Matching Game"),
-                p("Select the letter of the plot that matches each of the outputs 
-                   below. Then submit your answers to check if you are correct."),
+                p("Drag the items in each column so that the plots in the first column
+                  are in the same order as their corresponding output in the second column. 
+                  Then, click Submit to check your answers. Once all of your answers 
+                  are correct, click New for a new set of plots."),
                 fluidRow(
                   column(
                     width = 6,
@@ -473,7 +508,8 @@ ui <- list(
                       inputId = "new",
                       label = "New",
                       size = "large",
-                      style = "default"
+                      style = "default",
+                      #disabled = TRUE
                     )
                     
                   )
@@ -1054,6 +1090,22 @@ server <- function(input, output, session) {
     }
     }
   )
+  
+  # Clear feedback ----
+  
+  observeEvent(input$rankplots, {
+    for(i in 1:3){
+      output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon()
+    }
+    #output$scoreL1 <- renderUI({NULL})
+  })
+  
+  observeEvent(input$rankoutputs, {
+    for(i in 1:3){
+      output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon()
+    }
+    #output$scoreL1 <- renderUI({NULL})
+  })
   
   
   
