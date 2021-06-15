@@ -273,58 +273,6 @@ ui <- list(
                # )
         ),
         
-        
-        
-        
-        
-        
-        # tabItem(tabName='box',
-        #         br(),
-        #         fluidRow(
-        #           column(3, bsButton('ano',HTML('<b> X </b> :Categorical <br/>  Y: Continuous'),type = 'toggle')),
-        #           column(1, 
-        #                  conditionalPanel("input.ano != 0",
-        #                                   img(src='line1.png',width=250,style='margin-top:6em;margin-left:6.5em'))
-        #           ),
-        #           column(5, offset = 2,
-        #                  conditionalPanel("input.ano != 0",
-        #                                   tags$a(uiOutput('box1'),href='http://shiny.science.psu.edu/auc39/ANOVA/',target="_blank"))
-        #           )
-        #         ),br(),br(),
-        #         fluidRow(
-        #           column(3, bsButton('regression' ,HTML('<b> X </b>:Continuous <br/>  Y: Continuous'),type = 'toggle')),
-        #           column(1, 
-        #                  conditionalPanel("input.regression != 0",
-        #                                   img(src='line2.png',width=250,style='margin-top:6em;margin-left:6.5em'))
-        #           ),
-        #           column(5,offset=2,
-        #                  conditionalPanel("input.regression != 0",
-        #                                   tags$a(uiOutput('box2'),href='http://tjmcintyre.shinyapps.io/AssumptionsApp/',target="_blank"))
-        #           )
-        #         ),br(),br(),
-        #         fluidRow(
-        #           column(3, bsButton('anc',HTML('<b> X </b>:Categorical & Continuous <br/>  Y: Continuous'),type = 'toggle')),
-        #           column(1, 
-        #                  conditionalPanel("input.anc != 0",
-        #                                   img(src='line3.png',width=250,style='margin-top:6em;margin-left:6.5em'))
-        #           ),
-        #           column(5,offset=2,
-        #                  conditionalPanel("input.anc != 0",
-        #                                   uiOutput('box3'))
-        #           )
-        #         ),br(),
-        #         fluidRow(
-        #           column(3,offset=4,actionButton("go2","Go to the overview",icon("bolt"),style='padding:10px; font-size:100%',class="circle grow"))
-        #         )
-        #         
-        #         
-        # ),
-        
-        
-        
-        
-        
-        
         tabItem(tabName ="exploring",
                 h2('ANCOVA Interaction Plot'),
                 p("First, choose a dataset to explore. Then, 
@@ -437,12 +385,7 @@ ui <- list(
                     )
                   )
                 )
-                
-                
-        ),
-        
-        
-        
+                ),
         tabItem(tabName='game',
                 h2("Matching Game"),
                 p("Drag the items in each column so that the plots in the first column
@@ -514,9 +457,6 @@ ui <- list(
                     
                   )
                 ),
-                  
-
-                
                 ),
         tabItem(
           tabName = "refs",
@@ -567,12 +507,7 @@ ui <- list(
         )
       )
   )
-  
-
 )
-
-
-
 
 #Server ----
 
@@ -896,9 +831,7 @@ server <- function(input, output, session) {
   
   
   ###ANCOVA analysis table###
-  output$analysis1<-renderPrint(
-    
-    
+  output$analysis1 <- renderPrint(
     if (input$menu1=='Otter') {anova(otters.model)}
     else if (input$menu1=='Diet'){
       if (input$select_conti=='Age' & input$select_covar=='Gender'){anova(diet.model2)}
@@ -909,37 +842,37 @@ server <- function(input, output, session) {
       else if (input$select_conti=='Pre-diet Weight' & input$select_covar=='Diet'){anova(diet.model7)}
     }
     else if (input$menu1=='Random'){
-      A<-'A'
-      B<-'B'
+      A <- 'A'
+      B <- 'B'
       
-      a<-input$inter1
-      b<-input$inter2
+      a <- input$inter1
+      b <- input$inter2
       
-      slope1<-input$slope1
-      slope2<-input$slope2
+      slope1 <- input$slope1
+      slope2 <- input$slope2
       
       def <- defData(varname = "inter", dist = "nonrandom", formula = a, id = "id")
       
-      def<- defData(def,varname = "slope", dist = "nonrandom", formula = slope1, id = "slope")
+      def <- defData(def,varname = "slope", dist = "nonrandom", formula = slope1, id = "slope")
       def <- defData(def, varname = "X", dist = "uniform", formula = "10;20")
       def <- defData(def, varname = "Y", formula = "inter + X * slope", variance = 11)
       
-      def2<- defData(varname = "inter", dist = "nonrandom", formula = b, id = "id")
+      def2 <- defData(varname = "inter", dist = "nonrandom", formula = b, id = "id")
       
       def2 <- defData(def2,varname = "slope", dist = "nonrandom", formula = slope2, id = "slope")
-      def2<- defDataAdd(def2, varname = "X", dist = "uniform", formula = "10;20")
+      def2 <- defDataAdd(def2, varname = "X", dist = "uniform", formula = "10;20")
       def2 <- defDataAdd(def2, varname = "Y", formula = "inter + X * slope", variance = 11)
       
       
       dt <- genData(input$sample, def)
-      dt2<-genData(input$sample,def2)
+      dt2 <- genData(input$sample, def2)
       
       names(dt2)[1]<-'id'
       
       dt$cov<-'A'
       dt2$cov<-'B'
       
-      comb<-rbind(dt,dt2)
+      comb <- rbind(dt,dt2)
       
       
       aov.model<-lm(Y~X+cov+cov:X,data=comb)
