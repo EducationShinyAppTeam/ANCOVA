@@ -1,16 +1,17 @@
 library(shiny)
-library(png)
+#library(png)
 library(shinyBS)
-library(shinyDND)
-library(shinyjs)
+#library(shinyDND)
+#library(shinyjs)
 library(ggplot2)
 library(dplyr)
 library(shinydashboard)
 library(simstudy)
-library(lubridate)
-library(shinyalert)
+#library(lubridate)
+#library(shinyalert)
 library(shinyWidgets)
 library(boastUtils)
+library(fontawesome)
 
 
 convertMenuItem <- function(mi,tabName) {
@@ -21,6 +22,7 @@ convertMenuItem <- function(mi,tabName) {
   }
   mi
 }
+maxScore <- 10
 
 ui <- list(
   dashboardPage(
@@ -81,25 +83,36 @@ ui <- list(
         tabItem(tabName = "instruction",
                 h1("ANCOVA"),
                 h2("About:"),
-                h4('This app introduces the concept of ANCOVA focusing on 
+                p('This app introduces the concept of ANCOVA focusing on 
                          interpreting interaction plots.'),
                 br(),
                 h2('Instructions:'),
-                h4(
-                  tags$li('Click Go button to enter the explore page. Use 
-                                the dropdown menu to select a dataset.')
+                p(
+                  tags$li('Click the prerequisite button to review the prerequisites
+                          if needed.')
                 ),
-                h4(
+                p(
+                  tags$li('Navigate to the explore page. Use the dropdown menu to 
+                          select a dataset.')
+                ),
+                p(
                   tags$li('Use the radio buttons to select different variables 
-                                and see the changes in the interaction plot. Or 
-                                use slider bars to change the parameters. ')
+                                and see the changes in the interaction plot. You 
+                                can also use the slider bars to change the parameters.')
                 ),
-                h4(
+                p(
                   tags$li('After working with the explore section, you can 
                                 start the matching game to test your understanding 
-                                of the concepts. Click "start" to set the timer 
-                                and start the game. You can use "i" button for 
-                                instruction and "?" for hints.')
+                                of the concepts.')
+                ),
+                p(
+                  tags$li('Drag the items in each column so that the plots in the 
+                          first column are in the same order as their corresponding 
+                          output in the second column.')
+                ),
+                p(
+                  tags$li('Then, click Submit to check your answers. Once all of 
+                          your answers are correct, click New for a new set of plots.')
                 ),
                 div(style = "text-align: center",
                     bsButton(inputId = "go",
@@ -110,7 +123,7 @@ ui <- list(
                 ),
                 br(),
                 h2('Acknowledgements:'),
-                h4("This app was developed and coded by Luxin Wang and
+                p("This app was developed and coded by Luxin Wang and
                          modified by Zhiruo Wang and Lydia Bednarczyk."),
                 uiOutput('ack2')
         ),
@@ -118,7 +131,7 @@ ui <- list(
         tabItem(tabName = "prereq",
                 h2('Prerequisites'),
                 h3('What is ANCOVA:'),
-                h4('ANCOVA is the analysis of variance with continuous 
+                p('ANCOVA is the analysis of variance with continuous 
                          variables added in. The information below will explain 
                          the difference between ANOVA, Regression, and ANCOVA.'),
                 br(),
@@ -126,7 +139,7 @@ ui <- list(
                   column(
                     width = 2,
                     offset = 0,
-                    h4("X: Categorical", tags$br(),"Y: Continuous")
+                    p("X: Categorical", tags$br(),"Y: Continuous")
                   ),
                   column(
                     width = 1,
@@ -137,7 +150,7 @@ ui <- list(
                   column(
                     width = 6,
                     offset = 0,
-                    h4("ANOVA is used for comparing three or more group means.",
+                    p("ANOVA is used for comparing three or more group means.",
                        tags$br(),
                        "Different groups are different levels of categorical 
                              variables, and group means are calculated from continuous 
@@ -154,7 +167,7 @@ ui <- list(
                   column(
                     width = 2,
                     offset = 0,
-                    h4("X: Continuous", tags$br(),"Y: Continuous")
+                    p("X: Continuous", tags$br(),"Y: Continuous")
                   ),
                   column(
                     width = 1,
@@ -165,7 +178,7 @@ ui <- list(
                   column(
                     width = 6,
                     offset = 0,
-                    h4("Regression is used for determining the relationship 
+                    p("Regression is used for determining the relationship 
                              between two continuous variables.",
                        tags$br(),
                        "One dependent variable (Y) can also be affected by 
@@ -181,7 +194,7 @@ ui <- list(
                   column(
                     width = 2,
                     offset = 0,
-                    h4("X: Categorical & Continuous", tags$br(),"Y: Continuous")
+                    p("X: Categorical & Continuous", tags$br(),"Y: Continuous")
                   ),
                   column(
                     width = 1,
@@ -192,7 +205,7 @@ ui <- list(
                   column(
                     width = 6,
                     offset = 0,
-                    h4("ANCOVA is used by adding continuous variables onto ANOVA 
+                    p("ANCOVA is used by adding continuous variables onto ANOVA 
                              analysis, which is called covariate.",
                        tags$br(),
                        "Significant differences between group means, and 
@@ -205,7 +218,7 @@ ui <- list(
                 ),
                 h3('Diagnostic Plots:'),
                 #fluidRow(
-                  h4('Model checking is a critical part of an analysis. You 
+                  p('Model checking is a critical part of an analysis. You 
                          need to understand these four diagnostic plots:',
                      br(),
                      br(),
@@ -367,15 +380,7 @@ ui <- list(
                   
                   mainPanel(
                     plotOutput('plot_gg'),
-                    bsPopover('plot_gg', 
-                  'Notice', 'Different lines represent 
-                              different values of covariate. Remember intersection 
-                              does not imply significant interaction.', 
-                              placement = "bottom", 
-                              trigger = "hover", options = NULL),
                     tags$b(verbatimTextOutput('analysis1')),
-                    bsPopover('analysis1', 'ANOVA Table', 'Pay attention to the last column. Small p-value indicates siginificant influence or interaction.', placement = "top", trigger = "hover", options = NULL),
-                    
                     div(style = "text-align: center",
                         bsButton(inputId = "game",
                                  label = "Play!",
@@ -454,8 +459,16 @@ ui <- list(
                       style = "default",
                       #disabled = TRUE
                     )
-                    
                   )
+                  # ,
+                  # column(
+                  #   width = 1,
+                  #   p("Your score")
+                  # ),
+                  # column(
+                  #   width = 1,
+                  #   uiOutput("score")
+                  # )
                 ),
                 ),
         tabItem(
@@ -499,6 +512,14 @@ ui <- list(
             "Hijmans, Robert J. (2021). raster: Geographic Data Analysis and Modeling. 
             (v3.4-10) [R Package]. Available from https://CRAN.R-project.org/package=raster"
           ),
+          p(
+            class = "hangingindent",
+            "https://www.sheffield.ac.uk/mash/data"
+          ),
+          p(
+            class = "hangingindent",
+            "https://github.com/dzchilds"
+          ),
           br(),
           br(),
           br(),
@@ -519,9 +540,6 @@ diet$Diet<-as.character(diet$Diet)
 bank = read.csv("questionbank.csv")
 bank = data.frame(lapply(bank, as.character), stringsAsFactors = FALSE)
 
-
-
-
 server <- function(input, output, session) {
   observeEvent(
     eventExpr = input$info,
@@ -535,28 +553,6 @@ server <- function(input, output, session) {
       associated ANOVA table."
       )
     })
-  output$ack2 <- renderUI((
-    h4('Thanks for the data set and code provided by The University of Sheffield 
-       (',url,') and Dr.Dylan Childs(',url2,').')
-  ))
-  
-  url <- a("www.sheffield.ac.uk/mash/data", 
-           href="https://www.sheffield.ac.uk/mash/data",
-           target="_blank")
-  url2 <- a("github.com/dzchilds", 
-            href="https://github.com/dzchilds",
-            target="_blank")
-  
-  # output$box1<-renderUI(h4('ANOVA is used for comparing three or more group means. 
-  #                          Different groups are different levels of categorical variables, and group means are calculated from continuous variables.
-  #                          ',br(),br(),'EX. Are the average score of three STAT 200 sections significantly different from each other?'))
-  # 
-  # output$box2<-renderUI(h4('Regression is used for determining the relationship between two continuous variables. One dependent variable (Y) can also be affected by multiple independent variables (X).  
-  #                          ',br(),br(),'EX. How will crime rate be impacted by population density, unemployment rate, and income.'))
-  # 
-  # output$box3<-renderUI(h4('ANCOVA is adding continuous variables onto ANOVA analysis, which is called covariate. 
-  #                          Significant different between group means and significant relationship between continuous variables will both be analyzed.
-  #                          ',br(),br(),'EX. Who makes the most money? Will gender or years after graduation influence the income? '))
   
   ####button###
   
@@ -585,7 +581,9 @@ server <- function(input, output, session) {
         selected = "game")
     })
   
-  
+  attempts <- reactiveValues(
+    numattempts = 0)
+  gamescore <- reactiveVal(0)
   #Download the dataset ----
   
   # Reactive value for selected dataset ----
@@ -659,7 +657,7 @@ server <- function(input, output, session) {
   
   
   ###save random model
-  rand<-reactiveValues(rand_mod=NULL)
+  rand <- reactiveValues(rand_mod=NULL)
   
   ###Graph the plot of interaction###
   
@@ -773,75 +771,8 @@ server <- function(input, output, session) {
     }
     
     else if (input$menu1 == 'Random'){
-      
-      
       ###create data with label A and B with different slope and intersection
       
-      A<-'A'
-      B<-'B'
-      
-      a<-input$inter1
-      b<-input$inter2
-      
-      slope1<-input$slope1
-      slope2<-input$slope2
-      
-      def <- defData(varname = "inter", dist = "nonrandom", formula = a, id = "id")
-      
-      def<- defData(def,varname = "slope", dist = "nonrandom", formula = slope1, id = "slope")
-      def <- defData(def, varname = "X", dist = "uniform", formula = "0;20")
-      def <- defData(def, varname = "Y", formula = "inter + X * slope", variance = 11)
-      
-      def2<- defData(varname = "inter", dist = "nonrandom", formula = b, id = "id")
-      
-      def2 <- defData(def2,varname = "slope", dist = "nonrandom", formula = slope2, id = "slope")
-      def2<- defDataAdd(def2, varname = "X", dist = "uniform", formula = "0;20")
-      def2 <- defDataAdd(def2, varname = "Y", formula = "inter + X * slope", variance =11)
-      
-      
-      dt <- genData(input$sample, def)
-      dt2<-genData(input$sample,def2)
-      
-      names(dt2)[1]<-'id'
-      
-      dt$cov<-'A'
-      dt2$cov<-'B'
-      
-      comb<-rbind(dt,dt2)
-      
-      
-      aov.model<-lm(Y~X+cov+cov:X,data=comb)
-      
-      
-      
-      pred.aov <- expand.grid(X =0:20, cov = c("A","B"))
-      pred.aov <- mutate(pred.aov, Y = predict(aov.model, pred.aov))
-      
-      
-      ggplot(pred.aov, aes(x = X, y = Y, colour = cov)) + 
-        geom_line() + geom_point(data = comb) + 
-        xlab("X") + ylab("Y")+theme(text = element_text(size=20),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                    panel.background = element_blank(), axis.line = element_line(colour = "black"))}
-    
-    
-    
-  )
-  
-  
-  
-  
-  ###ANCOVA analysis table###
-  output$analysis1 <- renderPrint(
-    if (input$menu1=='Otter') {anova(otters.model)}
-    else if (input$menu1=='Diet'){
-      if (input$select_conti=='Age' & input$select_covar=='Gender'){anova(diet.model2)}
-      else if (input$select_conti=='Height' & input$select_covar=='Gender'){anova(diet.model3)}
-      else if (input$select_conti=='Pre-diet Weight' & input$select_covar=='Gender'){anova(diet.model4)}
-      else if (input$select_conti=='Age' & input$select_covar=='Diet'){anova(diet.model5)}
-      else if (input$select_conti=='Height' & input$select_covar=='Diet'){anova(diet.model6)}
-      else if (input$select_conti=='Pre-diet Weight' & input$select_covar=='Diet'){anova(diet.model7)}
-    }
-    else if (input$menu1=='Random'){
       A <- 'A'
       B <- 'B'
       
@@ -851,148 +782,292 @@ server <- function(input, output, session) {
       slope1 <- input$slope1
       slope2 <- input$slope2
       
-      def <- defData(varname = "inter", dist = "nonrandom", formula = a, id = "id")
+      def <- defData(varname = "inter", 
+                     dist = "nonrandom",
+                     formula = a, 
+                     id = "id")
+      def<- defData(def,
+                    varname = "slope", 
+                    dist = "nonrandom", 
+                    formula = slope1, 
+                    id = "slope")
+      def <- defData(def, 
+                     varname = "X", 
+                     dist = "uniform", 
+                     formula = "0;20")
+      def <- defData(def, 
+                     varname = "Y", 
+                     formula = "inter + X * slope", 
+                     variance = 11)
       
-      def <- defData(def,varname = "slope", dist = "nonrandom", formula = slope1, id = "slope")
-      def <- defData(def, varname = "X", dist = "uniform", formula = "10;20")
-      def <- defData(def, varname = "Y", formula = "inter + X * slope", variance = 11)
+      def2<- defData(varname = "inter", 
+                     dist = "nonrandom", 
+                     formula = b, 
+                     id = "id")
+      def2 <- defData(def2,
+                      varname = "slope",
+                      dist = "nonrandom", 
+                      formula = slope2, 
+                      id = "slope")
+      def2<- defData(def2, 
+                     varname = "X", 
+                     dist = "uniform", 
+                     formula = "0;20")
+      def2 <- defData(def2, 
+                      varname = "Y", 
+                      formula = "inter + X * slope", 
+                      variance =11)
       
-      def2 <- defData(varname = "inter", dist = "nonrandom", formula = b, id = "id")
+      dt <- genData(input$sample, def)
+      dt2 <- genData(input$sample,def2)
       
-      def2 <- defData(def2,varname = "slope", dist = "nonrandom", formula = slope2, id = "slope")
-      def2 <- defDataAdd(def2, varname = "X", dist = "uniform", formula = "10;20")
-      def2 <- defDataAdd(def2, varname = "Y", formula = "inter + X * slope", variance = 11)
+      names(dt2)[1] <- 'id'
       
+      dt$cov <- 'A'
+      dt2$cov <- 'B'
+      
+      comb <- rbind(dt,dt2)
+      
+      aov.model <- lm(Y~X+cov+cov:X, data=comb)
+      
+      pred.aov <- expand.grid(X = 0:20, 
+                              cov = c("A","B"))
+      pred.aov <- mutate(pred.aov, 
+                         Y = predict(aov.model, pred.aov))
+      
+      ggplot(pred.aov, 
+             aes(x = X, 
+                 y = Y, 
+                 colour = cov)) +
+        geom_line() + 
+        geom_point(data = comb) + 
+        xlab("X") + 
+        ylab("Y") +
+        theme(text = element_text(size=20),
+              panel.grid.major = element_blank(), 
+              panel.grid.minor = element_blank(),
+              panel.background = element_blank(), 
+              axis.line = element_line(colour = "black"))
+    }
+    )
+  
+  ###ANCOVA analysis table###
+  output$analysis1 <- renderPrint(
+    if (input$menu1 == 'Otter') {
+      anova(otters.model)
+      }
+    else if (input$menu1 == 'Diet') {
+      if (input$select_conti == 'Age' & input$select_covar == 'Gender'){
+        anova(diet.model2)
+        }
+      else if (input$select_conti == 'Height' & input$select_covar == 'Gender'){
+        anova(diet.model3)
+        }
+      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Gender'){
+        anova(diet.model4)
+        }
+      else if (input$select_conti == 'Age' & input$select_covar == 'Diet'){
+        anova(diet.model5)
+        }
+      else if (input$select_conti == 'Height' & input$select_covar == 'Diet'){
+        anova(diet.model6)
+        }
+      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Diet'){
+        anova(diet.model7)
+        }
+    }
+    else if (input$menu1 == 'Random'){
+      A <- 'A'
+      B <- 'B'
+      
+      a <- input$inter1
+      b <- input$inter2
+      
+      slope1 <- input$slope1
+      slope2 <- input$slope2
+      
+      def <- defData(varname = "inter", 
+                     dist = "nonrandom", 
+                     formula = a, 
+                     id = "id")
+      def <- defData(def,
+                     varname = "slope", 
+                     dist = "nonrandom", 
+                     formula = slope1, 
+                     id = "slope")
+      def <- defData(def, 
+                     varname = "X", 
+                     dist = "uniform", 
+                     formula = "10;20")
+      def <- defData(def, 
+                     varname = "Y", 
+                     formula = "inter + X * slope", 
+                     variance = 11)
+      
+      def2 <- defData(varname = "inter", 
+                      dist = "nonrandom", 
+                      formula = b, 
+                      id = "id")
+      def2 <- defData(def2,
+                      varname = "slope", 
+                      dist = "nonrandom", 
+                      formula = slope2, 
+                      id = "slope")
+      def2 <- defData(def2, 
+                      varname = "X", 
+                      dist = "uniform", 
+                      formula = "10;20")
+      def2 <- defData(def2, 
+                      varname = "Y", 
+                      formula = "inter + X * slope", 
+                      variance = 11)
       
       dt <- genData(input$sample, def)
       dt2 <- genData(input$sample, def2)
       
-      names(dt2)[1]<-'id'
+      names(dt2)[1] <- 'id'
       
-      dt$cov<-'A'
-      dt2$cov<-'B'
+      dt$cov <- 'A'
+      dt2$cov <- 'B'
       
       comb <- rbind(dt,dt2)
       
-      
-      aov.model<-lm(Y~X+cov+cov:X,data=comb)
+      aov.model <- lm(Y~X+cov+cov:X, data=comb)
       
       ##testing passing the model
-      rand$rand_mod<-anova(aov.model)[3,"Pr(>F)"]
+      rand$rand_mod <- anova(aov.model)[3, "Pr(>F)"]
       
       anova(aov.model)
-      
-      
     }
-    
-    
-  )
-  
-  
+    )
+
   #####get p values for each interaction 
   
-  var<-reactiveValues(p=NULL)
+  var <- reactiveValues(p = NULL)
   observe({
-    
-    # if (is.null(input$menu1)){
-    #   return()
-    # }
-    # 
-    # isolate({
-    #   var$p<-as.numeric(anova(otters.model)[3,"Pr(>F)"])
-    #  
-    # })
-    
-    
-    if (input$menu1=='Otter') {var$p<-as.numeric(anova(otters.model)[3,"Pr(>F)"])}
-    else if (input$menu1=='Diet'){
-      if (input$select_conti=='Age' & input$select_covar=='Gender'){var$p<-as.numeric(anova(diet.model2)[3,"Pr(>F)"])}
-      else if (input$select_conti=='Height' & input$select_covar=='Gender'){var$p<-as.numeric(anova(diet.model3)[3,"Pr(>F)"])}
-      else if (input$select_conti=='Pre-diet Weight' & input$select_covar=='Gender'){var$p<-as.numeric(anova(diet.model4)[3,"Pr(>F)"])}
-      else if (input$select_conti=='Age' & input$select_covar=='Diet'){var$p<-as.numeric(anova(diet.model5)[3,"Pr(>F)"])}
-      else if (input$select_conti=='Height' & input$select_covar=='Diet'){var$p<-as.numeric(anova(diet.model6)[3,"Pr(>F)"])}
-      else if (input$select_conti=='Pre-diet Weight' & input$select_covar=='Diet'){var$p<-as.numeric(anova(diet.model7)[3,"Pr(>F)"])}
+    if (input$menu1 == 'Otter') {
+      var$p <- as.numeric(anova(otters.model)[3,"Pr(>F)"])
+      }
+    else if (input$menu1 == 'Diet'){
+      if (input$select_conti == 'Age' & input$select_covar == 'Gender'){
+        var$p <- as.numeric(anova(diet.model2)[3,"Pr(>F)"])
+        }
+      else if (input$select_conti == 'Height' & input$select_covar == 'Gender'){
+        var$p <- as.numeric(anova(diet.model3)[3,"Pr(>F)"])
+        }
+      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Gender'){
+        var$p <- as.numeric(anova(diet.model4)[3,"Pr(>F)"])
+        }
+      else if (input$select_conti == 'Age' & input$select_covar == 'Diet'){
+        var$p <- as.numeric(anova(diet.model5)[3,"Pr(>F)"])
+        }
+      else if (input$select_conti == 'Height' & input$select_covar == 'Diet'){
+        var$p <- as.numeric(anova(diet.model6)[3,"Pr(>F)"])
+        }
+      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Diet'){
+        var$p <- as.numeric(anova(diet.model7)[3,"Pr(>F)"])
+        }
     }
-    else if (input$menu1=='Random'){var$p<-as.numeric(rand$rand_mod)}
+    else if (input$menu1 == 'Random'){
+      var$p <- as.numeric(rand$rand_mod)
+      }
   })
   
-  output$p<-renderUI(
-    if (var$p<=0.05){
-      h4(strong('P-value for this interaction is',signif(var$p,4),'.' ,br(),'Since the p-value is smaller than 0.05
-                (α=0.05), there is a statistically significant interaction between these two variables.'))}
-    else {h4(strong('P-value for this interaction is',signif(var$p,4),'.' ,br(),'Since the p-value is greater than 0.05
-                    (α=0.05), there is NOT a statistically significant interaction between these two variables.'))}
+  output$p <- renderUI(
+    if (var$p <= 0.05){
+      p(strong('P-value for this interaction is', 
+                signif(var$p,4), 
+                '.' , 
+                br(),
+                'Since the p-value is smaller than 0.05 (α=0.05), there is a statistically 
+                significant interaction between these two variables.'))
+      }
+    else {(strong('P-value for this interaction is', 
+                    signif(var$p,4),
+                    '.' ,
+                    br(),
+                    'Since the p-value is greater than 0.05 (α=0.05), there is NOT 
+                    a statistically significant interaction between these two variables.'))
+      }
   )
   
-  
-  
-  
-  
   #  Game ----
-  numbers <- reactiveValues(strong = c(), moderate = c(), insig = c(), index = c(), question = data.frame())
+  numbers <- reactiveValues(strong = c(), 
+                            moderate = c(), 
+                            insig = c(), 
+                            index = c(), 
+                            question = data.frame())
   
-  observeEvent(input$pages,{
-    numbers$strong = sample(1:12,1)
-    numbers$moderate = sample(13:24,1)
-    numbers$insig= sample(25:36,1)
+  observeEvent(
+    eventExpr = input$pages,
+    handlerExpr = {
+      numbers$strong = sample(1:12,1)
+      numbers$moderate = sample(13:24,1)
+      numbers$insig = sample(25:36,1)
+      numbers$index = c("A","B","C")
+      numbers$question = cbind(bank[c(numbers$strong,numbers$moderate,numbers$insig),],
+                               numbers$index)
+      })
+       
+  observeEvent(
+    eventExpr = input$new,
+    handlerExpr = {
+      numbers$strong = sample(1:12,1)
+      numbers$moderate = sample(13:24,1)
+      numbers$insig = sample(25:36,1)
+      numbers$index = c("A","B","C")
+      numbers$question = cbind(bank[c(numbers$strong,numbers$moderate,numbers$insig),],
+                               numbers$index)
+    }
+  )
     
-    
-    numbers$index =c("A","B","C")
-    numbers$question = cbind(bank[c(numbers$strong,numbers$moderate,numbers$insig),],numbers$index)
-    
-  })
-  
-  observeEvent(input$new,{
-    numbers$strong = sample(1:12,1)
-    numbers$moderate = sample(13:24,1)
-    numbers$insig= sample(25:36,1)
-    
-    
-    numbers$index = c("A","B","C")
-    numbers$question = cbind(bank[c(numbers$strong,numbers$moderate,numbers$insig),],numbers$index)
-    
-    # updateRadioButtons(session, 'radio1','',c('A','B','C'),selected='',inline=TRUE)
-    # updateRadioButtons(session,"radio2", '',c('A','B','C'),selected='',inline=TRUE)
-    # updateRadioButtons(session, "radio3", '',c('A','B','C'),selected='',inline=TRUE)
-  })
   
   
   ## Set up matching columns ----
   output$plotCol <- renderUI({
     plots <- list(
-      "1" = img(src = numbers$question[numbers$question[5] == "A",4], 
+      "1" = img(src = numbers$question[numbers$question[7] == "A",4], 
                 width = "35%",
-                class = "expandable"),
-      "2" = img(src = numbers$question[numbers$question[5] == "B",4], 
+                class = "expandable",
+                alt = numbers$question[numbers$question[7] == "A",5]),
+      "2" = img(src = numbers$question[numbers$question[7] == "B",4], 
                 width = "35%", 
-                class = "expandable"),
-      "3" = img(src = numbers$question[numbers$question[5] == "C",4], 
+                class = "expandable",
+                alt = numbers$question[numbers$question[7] == "B",5]),
+      "3" = img(src = numbers$question[numbers$question[7] == "C",4], 
                 width = "35%",
-                class = "expandable")
+                class = "expandable",
+                alt = numbers$question[numbers$question[7] == "C",5]
+                )
     )
     sortable::rank_list(
       input_id = "rankplots",
       text = "Drag the plots into the same order as the outputs.",
-      labels = sample(plots, size = length(plots))
+      labels = sample(plots, 
+                      size = length(plots))
     )
   })
   
   output$outputCol <- renderUI({
     outputs <- list(
-      "1" = img(src = numbers$question[numbers$question[5] == "A",3], 
+      "1" = img(src = numbers$question[numbers$question[7] == "A",3], 
                 width = "60%",
-                class = "expandable"),
-      "2" = img(src = numbers$question[numbers$question[5] == "B",3], 
+                class = "expandable",
+                alt = numbers$question[numbers$question[7] == "A",6]),
+      "2" = img(src = numbers$question[numbers$question[7] == "B",3], 
                 width = "60%", 
-                class = "expandable"),
-      "3" = img(src = numbers$question[numbers$question[5] == "C",3], 
+                class = "expandable",
+                alt = numbers$question[numbers$question[7] == "A",6]),
+      "3" = img(src = numbers$question[numbers$question[7] == "C",3], 
                 width = "60%",
-                class = "expandable")
+                class = "expandable",
+                alt = numbers$question[numbers$question[7] == "A",6])
     )
     sortable::rank_list(
       input_id = "rankoutputs",
       text = "Drag the outputs into the same order as the plots.",
-      labels = sample(outputs, size = length(outputs))
+      labels = sample(outputs, 
+                      size = length(outputs))
     )
   })
   
@@ -1000,6 +1075,7 @@ server <- function(input, output, session) {
     eventExpr = input$submit, 
     handlerExpr = {
     matches <- input$rankplots == input$rankoutputs
+    attempts$numattempts <- isolate(attempts$numattempts) + 1
     
     for(i in 1:3){
       output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon(
@@ -1007,365 +1083,41 @@ server <- function(input, output, session) {
           test = matches[i], 
           yes = "correct", 
           no = "incorrect")
-      )
-    #   if (attempts$level1 == 1) {
-    #     initScore$level1 <- sum(3 * as.integer(matches) - 1)
-    #   } 
-    #   else {
-    #     subqScore$level1 <- sum(3 * as.integer(matches) - 1)
-    #   }
-    #   if (initScore$level1 == maxScores[1]) {subqScore$level1 <- maxScores[1]}
-    # }
-    # output$scoreL1 <- renderUI({
-    #   paste("Your Score:", ifelse(attempts$level1 == 1,
-    #                               initScore$level1,
-    #                               subqScore$level1))
+      )}
+   #       if (attempts$numattempts == 1) {
+   #          gamescore <- isolate(as.integer(matches))
+   #         } 
+   #         else {
+   #           gamescore <- isolate(as.integer(matches))
+   #         }
+   #         if (gamescore == maxScore) {gamescore <- maxScore}
+   #      
+   #      output$score <- renderUI({
+   #        paste("Your Score:", gamescore)
+   #   }
+   # )
     }
-    }
+
   )
   
   # Clear feedback ----
   
-  observeEvent(input$rankplots, {
-    for(i in 1:3){
-      output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon()
+  observeEvent(
+    eventExpr = input$rankplots, 
+    handlerExpr = {
+      for(i in 1:3){
+        output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon()
     }
-    #output$scoreL1 <- renderUI({NULL})
   })
   
-  observeEvent(input$rankoutputs, {
-    for(i in 1:3){
-      output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon()
+  observeEvent(
+    eventExpr = input$rankoutputs, 
+    handlerExpr = {
+      for(i in 1:3){
+        output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon()
     }
-    #output$scoreL1 <- renderUI({NULL})
   })
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  # output$plot1 <- renderUI({
-  #   img(src = numbers$question[numbers$question[5] == "A",4], width = "100%", height = "107%", style = "text-align: center")
-  # })
-  # 
-  # # output$table1 <- renderUI({
-  # #   img(src = numbers$question[numbers$question[5] == "A",3], width = "100%", height = "100%", style = "text-align: center")
-  # # })
-  # 
-  # output$plot2 <- renderUI({
-  #   img(src = numbers$question[numbers$question[5] == "B",4], width = "100%", height = "107%", style = "text-align: center")
-  # })
-  # 
-  # # output$table2 <- renderUI({
-  # #   img(src = numbers$question[numbers$question[5] == "B",3], width = "100%", height = "100%", style = "text-align: center")
-  # # })
-  # 
-  # output$plot3 <- renderUI({
-  #   img(src = numbers$question[numbers$question[5] == "C",4], width = "100%", height = "107%", style = "text-align: center")
-  # })
-  # 
-  # # output$table3 <- renderUI({
-  # #   img(src = numbers$question[numbers$question[5] == "C",3], width = "100%", height = "100%", style = "text-align: center")
-  # # })
-  # 
-  # #######randomize the table######
-  # 
-  # index2 <- reactiveValues(index2 = 3)
-  # 
-  # observeEvent(input$new,{index2$index2 <- sample(1:4,1, replace=TRUE, prob=NULL)
-  # })
-  # 
-  # observeEvent(input$reset,{index2$index2 <- sample(1:4,1, replace=TRUE, prob=NULL)
-  # })
-  # 
-  # output$table1<-renderUI({
-  #   if (index2$index2==1){img(src = numbers$question[numbers$question[5] == "A",3], width = "105%", height = "105%", style = "text-align: center")}
-  #   else if (index2$index2==2){img(src = numbers$question[numbers$question[5] == "B",3], width = "105%", height = "105%", style = "text-align: center")}
-  #   else if (index2$index2==3){img(src = numbers$question[numbers$question[5] == "C",3], width = "105%", height = "105%", style = "text-align: center")}
-  #   else if (index2$index2==4){img(src = numbers$question[numbers$question[5] == "A",3], width = "105%", height = "105%", style = "text-align: center")}
-  # })
-  # 
-  # output$table2<-renderUI({
-  #   if (index2$index2==1){img(src = numbers$question[numbers$question[5] == "B",3], width = "105%", height = "105%", style = "text-align: center")}
-  #   else if (index2$index2==2){img(src = numbers$question[numbers$question[5] == "C",3], width = "105%", height = "105%", style = "text-align: center")}
-  #   else if (index2$index2==3){img(src = numbers$question[numbers$question[5] == "A",3], width = "105%", height = "105%", style = "text-align: center")}
-  #   else if (index2$index2==4){img(src = numbers$question[numbers$question[5] == "C",3], width = "105%", height = "105%", style = "text-align: center")}
-  # })
-  # 
-  # output$table3<-renderUI({
-  #   if (index2$index2==1){img(src = numbers$question[numbers$question[5] == "C",3], width = "105%", height = "105%", style = "text-align: center")}
-  #   else if (index2$index2==2){img(src = numbers$question[numbers$question[5] == "A",3], width = "105%", height = "105%", style = "text-align: center")}
-  #   else if (index2$index2==3){img(src = numbers$question[numbers$question[5] == "B",3], width = "105%", height = "105%", style = "text-align: center")}
-  #   else if (index2$index2==4){img(src = numbers$question[numbers$question[5] == "B",3], width = "105%", height = "105%", style = "text-align: center")}
-  # })
-  # 
-  # 
-  # 
-  # ####letter for the plot
-  # output$a<-renderUI(h4('A'))
-  # output$b<-renderUI(h4('B'))
-  # output$c<-renderUI(h4('C'))
-  # #####buttons####
-  # 
-  # observeEvent(input$submitA,{
-  #   updateButton(session,"submitA",disabled = TRUE)
-  # })
-  # observeEvent(input$new,{
-  #   updateButton(session,"submitA",disabled = FALSE)
-  # })
-  # 
-  # observeEvent(input$submitA,{
-  #   updateButton(session,"new",disabled = FALSE)
-  # })
-  # 
-  # observeEvent(input$new,{
-  #   updateButton(session,"new",disabled = TRUE)
-  # })
-  # 
-  # 
-  # observeEvent(input$new, {
-  #   reset("radio1")
-  # })
-  # 
-  # 
-  # ###################check answers#####
-  # 
-  # summationC<-reactiveValues(correct1 = c(0), started=FALSE)
-  # 
-  # observeEvent(input$submitA,{
-  #   observeEvent(input$new,{
-  #     output$answer1 <- renderUI({
-  #       img(src = NULL,width=30)
-  #     })
-  #   })
-  #   observe({
-  #     output$answer1 <- renderUI({
-  #       if (!is.null(input$radio1)){
-  #         if (index2$index2==1 &input$radio1 == 'A'){
-  #           img(src = "check.png",width=30)
-  #         }
-  #         else if (index2$index2==2 &input$radio1 == 'B') {img(src = "check.png",width=30)}
-  #         else if (index2$index2==3 &input$radio1 == 'C'){img(src = "check.png",width=30)}
-  #         else if (index2$index2==4 &input$radio1 == 'A'){img(src = "check.png",width =30)}
-  #         else{
-  #           img(src = "cross.png",width=30)
-  #         }
-  #       }
-  #     })
-  #   })
-  # })
-  # 
-  # 
-  # observeEvent(input$submitA,{
-  #   observeEvent(input$new,{
-  #     output$answer2 <- renderUI({
-  #       img(src = NULL,width=30)
-  #     })
-  #   })
-  #   observe({
-  #     output$answer2 <- renderUI({
-  #       if (!is.null(input$radio2)){
-  #         if (index2$index2==1 &input$radio2 == 'B'){
-  #           img(src = "check.png",width=30)
-  #           
-  #         }
-  #         else if (index2$index2==2 &input$radio2 == 'C') {img(src = "check.png",width=30)}
-  #         else if (index2$index2==3 &input$radio2 == 'A'){img(src = "check.png",width=30)}
-  #         else if (index2$index2==4 &input$radio2 == 'C'){img(src = "check.png",width=30)}
-  #         else{
-  #           img(src = "cross.png",width=30)
-  #         }
-  #       }
-  #     })
-  #   })
-  # })
-  # 
-  # observeEvent(input$submitA,{
-  #   observeEvent(input$new,{
-  #     output$answer3 <- renderUI({
-  #       img(src = NULL,width=30)
-  #     })
-  #   })
-  #   observe({
-  #     output$answer3 <- renderUI({
-  #       if (!is.null(input$radio3)){
-  #         if (index2$index2==1 &input$radio3 == 'C'){
-  #           img(src = "check.png",width=30)
-  #         }
-  #         else if (index2$index2==2 &input$radio3 == 'A') {img(src = "check.png",width=30)}
-  #         else if (index2$index2==3 &input$radio3 == 'B'){img(src = "check.png",width=30)}
-  #         else if (index2$index2==4 &input$radio3 == 'B'){img(src = "check.png",width=30)}
-  #         else{
-  #           img(src = "cross.png",width=30);
-  #           
-  #         }
-  #       }
-  #     })
-  #   })
-  # })
-  # 
-  # 
-  # #####count correct answer ########
-  # summationC<-reactiveValues(correct1 = c(0),total=c(), started=FALSE)
-  # 
-  # observeEvent(input$submitA,{
-  #   for (i in input$radio1){
-  #     summationC$total = c(summationC$total,1)
-  #     if (index2$index2==1 &input$radio1 == 'A'){
-  #       summationC$correct1 = c(summationC$correct1,1)
-  #     }
-  #     else if (index2$index2==2 &input$radio1 == 'B') { summationC$correct1 = c(summationC$correct1,1)}
-  #     else if (index2$index2==3 &input$radio1 == 'C'){summationC$correct1 = c(summationC$correct1,1)}
-  #     else if (index2$index2==4 &input$radio1 == 'A'){summationC$correct1 = c(summationC$correct1,1)}
-  #     else{
-  #       summationC$correct1 = c(summationC$correct1,0)}
-  #     
-  #   }
-  #   
-  #   for (i in input$radio2){
-  #     summationC$total = c(summationC$total,1)
-  #     if (index2$index2==1 &input$radio2 == 'B'){
-  #       
-  #       summationC$correct1 = c(summationC$correct1,1)
-  #       
-  #     }
-  #     else if (index2$index2==2 &input$radio2 == 'C') {summationC$correct1 = c(summationC$correct1,1)}
-  #     else if (index2$index2==3 &input$radio2 == 'A'){summationC$correct1 = c(summationC$correct1,1)}
-  #     else if (index2$index2==4 &input$radio2 == 'C'){summationC$correct1 = c(summationC$correct1,1)}
-  #     else{
-  #       
-  #       summationC$correct1 = c(summationC$correct1,0)}
-  #   }
-  #   
-  #   
-  #   for (i in input$radio3){
-  #     summationC$total = c(summationC$total,1)
-  #     if (index2$index2==1 &input$radio3 == 'C'){
-  #       i
-  #       summationC$correct1 = c(summationC$correct1,1)
-  #     }
-  #     else if (index2$index2==2 &input$radio3 == 'A') {summationC$correct1 = c(summationC$correct1,1)}
-  #     else if (index2$index2==3 &input$radio3 == 'B'){summationC$correct1 = c(summationC$correct1,1)}
-  #     else if (index2$index2==4 &input$radio3 == 'B'){ summationC$correct1 = c(summationC$correct1,1)}
-  #     else{
-  #       
-  #       summationC$correct1 = c(summationC$correct1,0)}
-  #   }
-  # })
-  # 
-  # 
-  # 
-  # output$correctC <- renderPrint({
-  #   if (sum(c(summationC$correct1))==0) {cat("You have earned 0 points")}
-  #   else{
-  #     cat("You have earned",sum(c(summationC$correct1)),'points')}
-  # })
-  
 
-  
-  # ########show up the scoreing panel and popup####
-  # 
-  # 
-  # # observer that invalidates every second. If timer is active, decrease by one.
-  # observe({
-  #   invalidateLater(1000, session)
-  #   isolate({
-  #     if(active())
-  #     {
-  #       timer(timer()-1)
-  #       if(timer()<1)
-  #       {
-  #         active(FALSE)
-  #         shinyalert('Count Down Complete','Click to see your score',
-  #                    type = "success")
-  #         
-  #         output$scoreBox <- renderValueBox({
-  #           valueBox(
-  #             paste0(sum(c(summationC$correct1))), "Totel Score", icon = icon("list"),
-  #             color = "purple"
-  #           )
-  #         })
-  #         
-  #         output$percentBox <- renderValueBox({
-  #           if (sum(c(summationC$correct1))==0){valueBox(
-  #             paste0('0%'), "Accuracy", icon = icon("thumbs-up", lib = "glyphicon"),
-  #             color = "light-blue"
-  #           )}
-  #           else{
-  #             valueBox(
-  #               paste0(round(sum(c(summationC$correct1))/sum(c(summationC$total))*100,digit=1),'%'), "Accuracy", icon = icon("thumbs-up", lib = "glyphicon"),
-  #               color = "light-blue"
-  #             )}
-  #         })
-  #         
-  #         output$timeBox <- renderValueBox({
-  #           valueBox(
-  #             paste0(input$seconds,'s'), "Time Used", icon = icon("time",lib = "glyphicon"),
-  #             color = "maroon"
-  #           )
-  #         })
-  #         
-  #         
-  #       }
-  #       
-  #     }
-  #   })
-  # })
-  # 
-  
-  
-  # observers for actionbuttons
-  observeEvent(input$start_timer, {active(TRUE)})
-  #observeEvent(input$stop, {active(FALSE)})
-  observeEvent(input$start_timer, {timer(input$seconds)})
-  observeEvent(input$reset, {timer(input$seconds);active(FALSE)
-    output$scoreBox<-NULL; 
-    output$percentBox<-NULL;
-    output$timeBox<-NULL;
-    summationC$correct1 <- c(0); summationC$total=c()
-  })
-  
-  
-  ##closing for ui DON'T DELET####  
 }
 
 boastUtils::boastApp(ui = ui, server = server)
