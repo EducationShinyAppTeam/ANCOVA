@@ -12,6 +12,7 @@ library(simstudy)
 library(shinyWidgets)
 library(boastUtils)
 library(fontawesome)
+library(sortable)
 
 
 convertMenuItem <- function(mi,tabName) {
@@ -87,45 +88,35 @@ ui <- list(
                          interpreting interaction plots.'),
                 br(),
                 h2('Instructions:'),
-                p(
+                tags$ul(
                   tags$li('Click the prerequisite button to review the prerequisites
-                          if needed.')
-                ),
-                p(
+                          if needed.'),
                   tags$li('Navigate to the explore page. Use the dropdown menu to 
-                          select a dataset.')
-                ),
-                p(
+                          select a dataset.'),
                   tags$li('Use the radio buttons to select different variables 
                                 and see the changes in the interaction plot. You 
-                                can also use the slider bars to change the parameters.')
-                ),
-                p(
+                                can also use the slider bars to change the parameters.'),
                   tags$li('After working with the explore section, you can 
                                 start the matching game to test your understanding 
-                                of the concepts.')
-                ),
-                p(
+                                of the concepts.'),
                   tags$li('Drag the items in each column so that the plots in the 
                           first column are in the same order as their corresponding 
-                          output in the second column.')
-                ),
-                p(
+                          output in the second column.'),
                   tags$li('Then, click Submit to check your answers. Once all of 
-                          your answers are correct, click New for a new set of plots.')
+                          your answers are correct, click New for a new set of plots.')  
                 ),
                 div(style = "text-align: center",
                     bsButton(inputId = "go",
                              label = "Prerequisites",
                              icon = icon("book"),
-                             style = "danger",
+                             style = "default",
                              size = "large")
                 ),
                 br(),
                 h2('Acknowledgements:'),
                 p("This app was developed and coded by Luxin Wang and
                          modified by Zhiruo Wang and Lydia Bednarczyk."),
-                uiOutput('ack2')
+                div(class = "updated", "Last Update: 7/9/2021 by LSB.")
         ),
         #Adding prerequisites page
         tabItem(tabName = "prereq",
@@ -216,6 +207,7 @@ ui <- list(
                              years after graduation influence the income?")
                   )
                 ),
+                br(),
                 h3('Diagnostic Plots:'),
                 #fluidRow(
                   p('Model checking is a critical part of an analysis. You 
@@ -229,7 +221,7 @@ ui <- list(
                        tags$figure(
                          align = "center",
                          tags$img(
-                           src = "residualsvsfitted.png",
+                           src = "residualsvsfitted.PNG",
                            width = 550,
                            alt = "Picture of residuals vs fitted plot"
                          ),
@@ -242,7 +234,7 @@ ui <- list(
                      tags$figure(
                        align = "center",
                        tags$img(
-                         src = "normalqq.png",
+                         src = "normalqq.PNG",
                          width = 550,
                          alt = "Picture of normal QQ plot"
                        ),
@@ -256,7 +248,7 @@ ui <- list(
                      tags$figure(
                        align = "center",
                        tags$img(
-                         src = "scalelocation.png",
+                         src = "scalelocation.PNG",
                          width = 550,
                          alt = "Picture of a scale location plot"
                        ),
@@ -269,7 +261,7 @@ ui <- list(
                      tags$figure(
                        align = "center",
                        tags$img(
-                         src = "residualsvsleverage.png",
+                         src = "residualsvsleverage.PNG",
                          width = 550,
                          alt = "Picture of residuals vs leverage plot"
                        ),
@@ -280,7 +272,7 @@ ui <- list(
                       bsButton(inputId = "start",
                                label = "Explore!",
                                icon = icon("bolt"),
-                               style = "danger",
+                               style = "default",
                                size = "large")
                   )
                # )
@@ -381,13 +373,15 @@ ui <- list(
                   mainPanel(
                     plotOutput('plot_gg'),
                     tags$b(verbatimTextOutput('analysis1')),
+                    )
+                  ),
+                  fluidRow(
                     div(style = "text-align: center",
                         bsButton(inputId = "game",
                                  label = "Play!",
                                  icon = icon("bolt"),
-                                 style = "danger",
+                                 style = "default",
                                  size = "large")
-                    )
                   )
                 )
                 ),
@@ -530,7 +524,7 @@ ui <- list(
   )
 )
 
-#Server ----
+
 
 seaotters <- read.csv("Otter.csv",header=T)
 
@@ -540,6 +534,7 @@ diet$Diet<-as.character(diet$Diet)
 bank = read.csv("questionbank.csv")
 bank = data.frame(lapply(bank, as.character), stringsAsFactors = FALSE)
 
+#Server ----
 server <- function(input, output, session) {
   observeEvent(
     eventExpr = input$info,
@@ -786,16 +781,16 @@ server <- function(input, output, session) {
                      dist = "nonrandom",
                      formula = a, 
                      id = "id")
-      def<- defData(def,
+      def<- defData(dtDefs = def,
                     varname = "slope", 
                     dist = "nonrandom", 
                     formula = slope1, 
                     id = "slope")
-      def <- defData(def, 
+      def <- defData(dtDefs = def, 
                      varname = "X", 
                      dist = "uniform", 
                      formula = "0;20")
-      def <- defData(def, 
+      def <- defData(dtDefs = def, 
                      varname = "Y", 
                      formula = "inter + X * slope", 
                      variance = 11)
@@ -804,19 +799,19 @@ server <- function(input, output, session) {
                      dist = "nonrandom", 
                      formula = b, 
                      id = "id")
-      def2 <- defData(def2,
+      def2 <- defData(dtDefs = def2,
                       varname = "slope",
                       dist = "nonrandom", 
                       formula = slope2, 
                       id = "slope")
-      def2<- defData(def2, 
+      def2<- defData(dtDefs = def2, 
                      varname = "X", 
                      dist = "uniform", 
                      formula = "0;20")
-      def2 <- defData(def2, 
+      def2 <- defData(dtDefs = def2, 
                       varname = "Y", 
                       formula = "inter + X * slope", 
-                      variance =11)
+                      variance = 11)
       
       dt <- genData(input$sample, def)
       dt2 <- genData(input$sample,def2)
