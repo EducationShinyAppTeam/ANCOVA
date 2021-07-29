@@ -1,14 +1,9 @@
 library(shiny)
-#library(png)
 library(shinyBS)
-#library(shinyDND)
-#library(shinyjs)
 library(ggplot2)
 library(dplyr)
 library(shinydashboard)
 library(simstudy)
-#library(lubridate)
-#library(shinyalert)
 library(shinyWidgets)
 library(boastUtils)
 library(fontawesome)
@@ -147,9 +142,8 @@ ui <- list(
                              variables, and group means are calculated from continuous 
                              variables.", 
                        tags$br(), 
-                       "Example: Are the average scores 
-                             of three STAT 200 sections significantly different 
-                             from each other?")
+                       "Example: Can differences between the average scores of three
+                      STAT 200 sections be explained by chance?")
                   )
                 ),
                 br(),
@@ -199,9 +193,8 @@ ui <- list(
                     p("ANCOVA is used by adding continuous variables onto ANOVA 
                              analysis, which is called covariate.",
                        tags$br(),
-                       "Significant differences between group means, and 
-                             significant relationships between continuous variables 
-                             are both analyzed.", 
+                       "Differences between group means and relationships between 
+                       continuous variables are both analyzed.", 
                        tags$br(), 
                        "Example: Who makes the most money? Will gender or 
                              years after graduation influence the income?")
@@ -225,7 +218,7 @@ ui <- list(
                            width = 550,
                            alt = "Picture of residuals vs fitted plot"
                          ),
-                         tags$figcaption("Image of residuals vs fitted plot.")
+                         tags$figcaption("Residuals vs fitted plot.")
                        ),
                      br(),
                      tags$li('The Normal Q-Q plot checks normality. If the 
@@ -238,7 +231,8 @@ ui <- list(
                          width = 550,
                          alt = "Picture of normal QQ plot"
                        ),
-                       tags$figcaption("Image of normal Q-Q plot.")
+                       tags$figcaption("Normal Q-Q plot for standardized residuals
+                                       with somewhat heavy tails.")
                      ),
                      br(),
                      tags$li('The Scale-Location plot checks for equal spread 
@@ -252,7 +246,7 @@ ui <- list(
                          width = 550,
                          alt = "Picture of a scale location plot"
                        ),
-                       tags$figcaption("Image of scale location plot.")
+                       tags$figcaption("Scale-location plot with slight fanning.")
                      ),
                      br(),
                      tags$li('The Residual vs Leverage plot checks for influential 
@@ -265,7 +259,7 @@ ui <- list(
                          width = 550,
                          alt = "Picture of residuals vs leverage plot"
                        ),
-                       tags$figcaption("Image of residuals vs leverage plot.")
+                       tags$figcaption("Residuals vs leverage plot.")
                      )),
                   ),
                   div(style = "text-align: center",
@@ -280,11 +274,9 @@ ui <- list(
         
         tabItem(tabName ="exploring",
                 h2('ANCOVA Interaction Plot'),
-                p("First, choose a dataset to explore. Then, 
-                                   adjust the inputs in order to see how they affect 
-                                   the outcome. Use the p-value to determine if 
-                                   there is a statistically significant interaction
-                                   between variables in the datasets."),
+                p("First, choose a dataset to explore. Then, adjust the inputs in 
+                order to see how they affect the outcome. See how the P-value 
+                relates to the interaction plot."),
                 sidebarLayout(
                   sidebarPanel(
                     selectInput(
@@ -497,14 +489,42 @@ ui <- list(
           ),
           p(
             class = "hangingindent",
+            "de Vries, Andrie (2020). sortable: Drag-and-Drop in 'shiny' Apps with
+            'SortableJS'. (v0.4.4) [R Package]. Available from 
+            https://CRAN.R-project.org/package=sortable"
+          ),
+          p(
+            class = "hangingindent",
+            "Goldfeld, K. (2020). simstudy: Simulation of Study Data. (v0.2.1) 
+            [R package]. Available from https://cran.r-project.org/package=simstudy"
+          ),
+          p(
+            class = "hangingindent",
+            "Hijmans, Robert J. (2021). raster: Geographic Data Analysis and Modeling. 
+            (v3.4-10) [R Package]. Available from https://CRAN.R-project.org/package=raster"
+          ),
+          p(
+            class = "hangingindent",
+            "Iannone, R. (2021). fontawesome: Easily work with 'Font Awesome' Icons.
+            (v0.2.1) [R Package]. Available from https://CRAN.R-project.org/package=fontawesome"
+          ),
+          p(
+            class = "hangingindent",
             "Perrier, V., Meyer, F., Granjon, D. (2019). shinyWidgets: Custom inputs 
             widgets for shiny. (v0.5.0) [R Package]. Available from 
             https://CRAN.R-project.org/package=shinyWidgets"
           ),
           p(
             class = "hangingindent",
-            "Hijmans, Robert J. (2021). raster: Geographic Data Analysis and Modeling. 
-            (v3.4-10) [R Package]. Available from https://CRAN.R-project.org/package=raster"
+            "Wickham, H. (2016). ggplot2: Elegant Graphics for Data Analysis. 
+            Springer-Verlag New York. R package version tidyverse. Available from 
+            https://ggplot2.tidyverse.org/"
+          ),
+          p(
+            class = "hangingindent",
+            "Wickham, H., François, R., Henry, L., and Müller, K. (2021) dplyr: 
+            A Grammar of Data Manipulation. (v1.0.6) [R package] Available from 
+            https://cran.r-project.org/package=dplyr"
           ),
           p(
             class = "hangingindent",
@@ -969,21 +989,27 @@ server <- function(input, output, session) {
   })
   
   output$p <- renderUI(
-    if (var$p <= 0.05){
-      p(strong('P-value for this interaction is', 
-                signif(var$p,4), 
+    if (var$p <= 0.01){
+      p(strong('P-value for this interaction is about', 
+                signif(var$p,1), 
                 '.' , 
                 br(),
-                'Since the p-value is smaller than 0.05 (α=0.05), there is a statistically 
-                significant interaction between these two variables.'))
+                'Since the p-value is very small, the model without the interaction 
+               term provides a poor explanation of the data.'))
       }
-    else {(strong('P-value for this interaction is', 
-                    signif(var$p,4),
+    else if (var$p >= 0.2) {
+      (strong('P-value for this interaction is about', 
+                    signif(var$p,1),
                     '.' ,
                     br(),
-                    'Since the p-value is greater than 0.05 (α=0.05), there is NOT 
-                    a statistically significant interaction between these two variables.'))
-      }
+                    'Since the p-value is very large, the model without the interaction 
+              term provides a reasonable explanation of the data.'))
+    }
+    else {
+      strong('P-value for this interaction is about', 
+             signif(var$p,1),
+             '.')
+    }
   )
   
   #  Game ----
