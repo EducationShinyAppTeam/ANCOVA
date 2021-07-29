@@ -202,9 +202,15 @@ ui <- list(
                 ),
                 br(),
                 h3('Diagnostic Plots:'),
-                #fluidRow(
+                fluidRow(
+                  tags$ul(
                   p('Model checking is a critical part of an analysis. You 
-                         need to understand these four diagnostic plots:',
+                    need to understand these four diagnostic plots. In order 
+                    to gain a better understanding of what properties of the plots 
+                    satisfy the assumptions, look at the',
+                    a(href='https://psu-eberly.shinyapps.io/Assumptions_of_ANOVA/', 
+                    'Assumptions of ANOVA'), 'app.')
+                  ),
                      br(),
                      br(),
                      tags$ul(
@@ -276,7 +282,8 @@ ui <- list(
                 h2('ANCOVA Interaction Plot'),
                 p("First, choose a dataset to explore. Then, adjust the inputs in 
                 order to see how they affect the outcome. See how the P-value 
-                relates to the interaction plot."),
+                relates to the interaction plot. When you're done exploring, click
+                  the Play button to test your knowledge in the matching game."),
                 sidebarLayout(
                   sidebarPanel(
                     selectInput(
