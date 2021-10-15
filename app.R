@@ -209,7 +209,7 @@ ui <- list(
                     to gain a better understanding of what properties of the plots 
                     satisfy the assumptions, look at the',
                     a(href='https://psu-eberly.shinyapps.io/Assumptions_of_ANOVA/', 
-                    'Assumptions of ANOVA'), 'app.')
+                    'Assumptions of ANOVA', class = 'bodylinks'), 'app.')
                   ),
                      br(),
                      br(),
@@ -965,7 +965,7 @@ server <- function(input, output, session) {
 
   #####get p values for each interaction 
   
-  var <- reactiveValues(p = NULL)
+  var <- reactiveValues(p = 1)
   observe({
     if (input$menu1 == 'Otter') {
       var$p <- as.numeric(anova(otters.model)[3,"Pr(>F)"])
@@ -996,7 +996,9 @@ server <- function(input, output, session) {
   })
   
   output$p <- renderUI(
-    if (var$p <= 0.01){
+    if (length(var$p) < 1) {
+    }
+    else if (var$p <= 0.01){
       p(strong('P-value for this interaction is about', 
                 signif(var$p,1), 
                 '.' , 
