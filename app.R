@@ -1,3 +1,4 @@
+# Load packages ----
 library(shiny)
 library(shinyBS)
 library(ggplot2)
@@ -7,383 +8,341 @@ library(simstudy)
 library(shinyWidgets)
 library(boastUtils)
 library(fontawesome)
-library(sortable)
+# library(sortable)
 
-
-convertMenuItem <- function(mi,tabName) {
-  mi$children[[1]]$attribs['data-toggle']="tab"
-  mi$children[[1]]$attribs['data-value'] = tabName
-  if(length(mi$attribs$class)>0 && mi$attribs$class=="treeview"){
-    mi$attribs$class=NULL
-  }
-  mi
-}
+# Set constants ----
 maxScore <- 10
 
+# Load data ? ----
+
+# Define UI ----
 ui <- list(
   dashboardPage(
-    skin = "black", 
-    dashboardHeader(title = "ANCOVA",
-                    titleWidth = 250,
-                    tags$li(
-                      class = "dropdown",
-                      actionLink("info",
-                                 icon("info"))
-                    ),
-                    tags$li(
-                      class = "dropdown",
-                      tags$a(target = "_blank", 
-                             icon("comments"),
-                             href = "https://pennstate.qualtrics.com/jfe/form/SV_7TLIkFtJEJ7fEPz?appName=ANCOVA"
-                      )
-                    ),
-                    tags$li(
-                      class = "dropdown",
-                      tags$a(icon("home"),
-                             href = 'https://shinyapps.science.psu.edu/'
-                      )
-                    )
+    skin = "black",
+    ## Header ----
+    dashboardHeader(
+      title = "ANCOVA",
+      titleWidth = 250,
+      tags$li(class = "dropdown", actionLink("info", icon("info"))),
+      tags$li(class = "dropdown", boastUtils::surveyLink(name = "ANCOVA")),
+      tags$li(
+        class = "dropdown",
+        tags$a(icon("home"), href = 'https://shinyapps.science.psu.edu/')
+      )
     ),
-    #adding pages to sidebar
+    ## Sidebar ----
     dashboardSidebar(
-      width = 220,
-      sidebarMenu(id = "pages",
-                  menuItem(text = "Overview",
-                           tabName = "instruction", 
-                           icon = icon("dashboard")
-                  ),
-                  menuItem(text = "Prerequisites", 
-                           tabName = "prereq", 
-                           icon = icon("book")
-                  ),
-                  menuItem(text = "Explore",
-                           tabName = "exploring", 
-                           icon = icon("wpexplorer")
-                  ),
-                  menuItem(text = "Game", 
-                           tabName = "game", 
-                           icon = icon("gamepad")
-                  ),
-                  menuItem(text = "References",
-                           tabName = "refs",
-                           icon = icon("leanpub")
-                  )
+      width = 250,
+      sidebarMenu(
+        id = "pages",
+        menuItem("Overview", tabName = "instruction", icon = icon("tachometer-alt")),
+        menuItem("Prerequisites", tabName = "prereq", icon = icon("book")),
+        menuItem("Explore", tabName = "exploring", icon = icon("wpexplorer")),
+        menuItem("Game", tabName = "game", icon = icon("gamepad")),
+        menuItem("References", tabName = "refs", icon = icon("leanpub"))
       ),
       tags$div(
         class = "sidebar-logo", 
         boastUtils::sidebarFooter()
       )
     ),
+    ## Body ----
     dashboardBody(
       tabItems(
-        tabItem(tabName = "instruction",
-                h1("ANCOVA"),
-                h2("About:"),
-                p('This app introduces the concept of ANCOVA focusing on 
-                         interpreting interaction plots.'),
-                br(),
-                h2('Instructions:'),
-                tags$ul(
-                  tags$li('Click the prerequisite button to review the prerequisites
-                          if needed.'),
-                  tags$li('Navigate to the explore page. Use the dropdown menu to 
-                          select a dataset.'),
-                  tags$li('Use the radio buttons to select different variables 
-                                and see the changes in the interaction plot. You 
-                                can also use the slider bars to change the parameters.'),
-                  tags$li('After working with the explore section, you can 
-                                start the matching game to test your understanding 
-                                of the concepts.'),
-                  tags$li('Drag the items in each column so that the plots in the 
-                          first column are in the same order as their corresponding 
-                          output in the second column.'),
-                  tags$li('Then, click Submit to check your answers. Once all of 
-                          your answers are correct, click New for a new set of plots.')  
-                ),
-                div(style = "text-align: center",
-                    bsButton(inputId = "go",
-                             label = "Prerequisites",
-                             icon = icon("book"),
-                             style = "default",
-                             size = "large")
-                ),
-                br(),
-                h2('Acknowledgements:'),
-                p("This app was developed and coded by Luxin Wang and
-                         modified by Zhiruo Wang and Lydia Bednarczyk."),
-                div(class = "updated", "Last Update: 7/9/2021 by LSB.")
+        ### Overview page ----
+        tabItem(
+          tabName = "instruction",
+          h1("Analysis of Covariance (ANCOVA)"),
+          p('This app introduces the concept of Analysis of Covariance or ANCOVA
+            focusing on interpreting interaction plots.'),
+          br(),
+          h2('Instructions'),
+          tags$ul(
+            tags$li('Click the prerequisite button to review the prerequisites 
+                    if needed.'),
+            tags$li('Navigate to the explore page. Use the dropdown menu to 
+                    select a dataset.'),
+            tags$li('Use the radio buttons to select different variables 
+                    and see the changes in the interaction plot. You can also
+                    use the slider bars to change the parameters.'),
+            tags$li('After working with the explore section, you can start the
+                    matching game to test your understanding of the concepts.'),
+            tags$li('Drag the items in each column so that the plots in the
+                    first column are in the same order as their corresponding
+                    output in the second column.'),
+            tags$li('Then, click Submit to check your answers. Once all of your
+                    answers are correct, click New for a new set of plots.')  
+          ),
+          div(
+            style = "text-align: center;",
+            bsButton(
+              inputId = "go",
+              label = "Prerequisites",
+              icon = icon("book"),
+              style = "default",
+              size = "large"
+            )
+          ),
+          br(),
+          h2('Acknowledgements'),
+          p("This app was developed and coded by Luxin Wang and modified by
+            Zhiruo Wang and Lydia Bednarczyk.",
+            br(),
+            br(),
+            "Cite this app as:",
+            br(),
+            boastUtils::citeApp(),
+            br(),
+            br(),
+            div(class = "updated", "Last Update: 12/3/2021 by NJH.")
+          )
         ),
-        #Adding prerequisites page
-        tabItem(tabName = "prereq",
-                h2('Prerequisites'),
-                h3('What is ANCOVA:'),
-                p('ANCOVA is the analysis of variance with continuous 
-                         variables added in. The information below will explain 
-                         the difference between ANOVA, Regression, and ANCOVA.'),
-                br(),
-                fluidRow(
-                  column(
-                    width = 2,
-                    offset = 0,
-                    p("X: Categorical", tags$br(),"Y: Continuous")
-                  ),
-                  column(
-                    width = 1,
-                    offset = 0,
-                    fa("long-arrow-alt-right",
-                       width = "5em")
-                  ),
-                  column(
-                    width = 6,
-                    offset = 0,
-                    p("ANOVA is used for comparing three or more group means.",
-                       tags$br(),
-                       "Different groups are different levels of categorical 
-                             variables, and group means are calculated from continuous 
-                             variables.", 
-                       tags$br(), 
-                       "Example: Can differences between the average scores of three
-                      STAT 200 sections be explained by chance?")
-                  )
-                ),
-                br(),
-                br(),
-                fluidRow(
-                  column(
-                    width = 2,
-                    offset = 0,
-                    p("X: Continuous", tags$br(),"Y: Continuous")
-                  ),
-                  column(
-                    width = 1,
-                    offset = 0,
-                    fa("long-arrow-alt-right",
-                       width = "5em")
-                  ),
-                  column(
-                    width = 6,
-                    offset = 0,
-                    p("Regression is used for determining the relationship 
-                             between two continuous variables.",
-                       tags$br(),
-                       "One dependent variable (Y) can also be affected by 
-                             multiple independent variables (X).", 
-                       tags$br(), 
-                       "Example: How will crime rate be impacted by population 
-                             density, unemployment rate, and income?")
-                  )
-                ),
-                br(),
-                br(),
-                fluidRow(
-                  column(
-                    width = 2,
-                    offset = 0,
-                    p("X: Categorical & Continuous", tags$br(),"Y: Continuous")
-                  ),
-                  column(
-                    width = 1,
-                    offset = 0,
-                    fa("long-arrow-alt-right",
-                       width = "5em")
-                  ),
-                  column(
-                    width = 6,
-                    offset = 0,
-                    p("ANCOVA is used by adding continuous variables onto ANOVA 
-                             analysis, which is called covariate.",
-                       tags$br(),
-                       "Differences between group means and relationships between 
-                       continuous variables are both analyzed.", 
-                       tags$br(), 
+        ### Prerequisites page ----
+        tabItem(
+          tabName = "prereq",
+          h2('Prerequisites'),
+          p("What is ANCOVA? ANCOVA (Analysis of Covariance) is the Analysis of 
+            Variance (ANOVA) with at least one continuous variables included in
+            the model. The information below will explain highlight the differences
+            between ANOVA, Regression, and ANCOVA."),
+          br(),
+          tags$table(
+            tags$thead(
+              tags$tr(
+                tags$th(scope = "col", width = "120px", "Response Variable (Y)"),
+                tags$th(scope = "col", width = "130px", "Explantory Variables (X's)"),
+                tags$th(scope = "col", width = "120px", "Type of Analysis"),
+                tags$th(scope = "col", "Explanation")
+              )
+            ),
+            tags$tbody(
+              tags$tr(
+                tags$td("Continuous Response"),
+                tags$td("Categorical Factor"),
+                tags$td("ANOVA"),
+                tags$td("ANOVA is used for comparing three or more group means.",
+                        tags$br(),
+                        "Different groups are different levels of categorical
+                        variables, and group means are calculated from continuous 
+                        variables.", 
+                        tags$br(), 
+                        "Example: Can differences between the average scores of
+                        three STAT 200 sections be explained by chance?")
+              ),
+              tags$tr(
+                tags$td("Continuous Response"),
+                tags$td("Continuous Predictor"),
+                tags$td("Regression"),
+                tags$td("Regression is used for determining the relationship 
+                        between two continuous variables.",
+                        tags$br(),
+                        "One dependent variable (Y) can also be affected by 
+                        multiple independent variables (X).", 
+                        tags$br(), 
+                        "Example: How will crime rate be impacted by population 
+                        density, unemployment rate, and income?")
+              ),
+              tags$tr(
+                tags$td("Continuous Response"),
+                tags$td("Categorical Factor AND Continuous Predictor"),
+                tags$td("ANCOVA"),
+                tags$td("ANCOVA is used by adding continuous variables onto ANOVA 
+                        analysis, which is called covariate.",
+                        tags$br(),
+                        "Differences between group means and relationships between 
+                        continuous variables are both analyzed.", 
+                        tags$br(), 
                        "Example: Who makes the most money? Will gender or 
-                             years after graduation influence the income?")
-                  )
-                ),
-                br(),
-                h3('Diagnostic Plots:'),
-                fluidRow(
-                  tags$ul(
-                  p('Model checking is a critical part of an analysis. You 
-                    need to understand these four diagnostic plots. In order 
-                    to gain a better understanding of what properties of the plots 
-                    satisfy the assumptions, look at the',
-                    a(href='https://psu-eberly.shinyapps.io/Assumptions_of_ANOVA/', 
-                    'Assumptions of ANOVA', class = 'bodylinks'), 'app.')
-                  ),
-                     br(),
-                     br(),
-                     tags$ul(
-                     tags$li('The Residuals vs Fitted plot checks the linear 
+                        years after graduation influence the income?")
+              )
+            )
+          ),
+          br(),
+          h3('Diagnostic Plots'),
+          p('Model checking is a critical part of an analysis. You need to 
+            understand these four diagnostic plots. In order to gain a better
+            understanding of what properties of the plots satisfy the assumptions,
+            look at the',
+            a(href = 'https://psu-eberly.shinyapps.io/Assumptions_of_ANOVA/', 
+              'Assumptions of ANOVA', class = 'bodylinks'), 'app.'),
+          tags$ul(
+            tags$li('The Residuals vs Fitted plot checks the linear 
                          pattern of residuals. If the linear model is correct, you 
                                  should expect a roughly horizontal line.'),
-                       tags$figure(
-                         align = "center",
-                         tags$img(
-                           src = "residualsvsfitted.PNG",
-                           width = 550,
-                           alt = "Picture of residuals vs fitted plot"
-                         ),
-                         tags$figcaption("Residuals vs fitted plot.")
-                       ),
-                     br(),
-                     tags$li('The Normal Q-Q plot checks normality. If the 
+            tags$figure(
+              align = "center",
+              tags$img(
+                src = "residualsvsfitted.PNG",
+                width = 550,
+                alt = "Picture of residuals vs fitted plot"
+              ),
+              tags$figcaption("Residuals vs fitted plot.")
+            ),
+            br(),
+            tags$li('The Normal Q-Q plot checks normality. If the 
                                  normality assumption is true, you should expect 
                                  the dots to roughly follow a straight line.'),
-                     tags$figure(
-                       align = "center",
-                       tags$img(
-                         src = "normalqq.PNG",
-                         width = 550,
-                         alt = "Picture of normal QQ plot"
-                       ),
-                       tags$figcaption("Normal Q-Q plot for standardized residuals
+            tags$figure(
+              align = "center",
+              tags$img(
+                src = "normalqq.PNG",
+                width = 550,
+                alt = "Picture of normal QQ plot"
+              ),
+              tags$figcaption("Normal Q-Q plot for standardized residuals
                                        with somewhat heavy tails.")
-                     ),
-                     br(),
-                     tags$li('The Scale-Location plot checks for equal spread 
+            ),
+            br(),
+            tags$li('The Scale-Location plot checks for equal spread 
                                  of the residuals. If the equal variance assumption 
                                  is true, you should expect a roughly horizontal 
                                  line with the dots showing equal spread.'),
-                     tags$figure(
-                       align = "center",
-                       tags$img(
-                         src = "scalelocation.PNG",
-                         width = 550,
-                         alt = "Picture of a scale location plot"
-                       ),
-                       tags$figcaption("Scale-location plot with slight fanning.")
-                     ),
-                     br(),
-                     tags$li('The Residual vs Leverage plot checks for influential 
+            tags$figure(
+              align = "center",
+              tags$img(
+                src = "scalelocation.PNG",
+                width = 550,
+                alt = "Picture of a scale location plot"
+              ),
+              tags$figcaption("Scale-location plot with slight fanning.")
+            ),
+            br(),
+            tags$li('The Residual vs Leverage plot checks for influential 
                                  outliers. Outliers with high leverage will appear 
                                  outside the dashed line range.'),
-                     tags$figure(
-                       align = "center",
-                       tags$img(
-                         src = "residualsvsleverage.PNG",
-                         width = 550,
-                         alt = "Picture of residuals vs leverage plot"
-                       ),
-                       tags$figcaption("Residuals vs leverage plot.")
-                     )),
-                  ),
-                  div(style = "text-align: center",
-                      bsButton(inputId = "start",
-                               label = "Explore!",
-                               icon = icon("bolt"),
-                               style = "default",
-                               size = "large")
-                  )
-               # )
+            tags$figure(
+              align = "center",
+              tags$img(
+                src = "residualsvsleverage.PNG",
+                width = 550,
+                alt = "Picture of residuals vs leverage plot"
+              ),
+              tags$figcaption("Residuals vs leverage plot.")
+            )),
+          div(
+            style = "text-align: center;",
+            bsButton(
+              inputId = "start",
+              label = "Explore!",
+              icon = icon("bolt"),
+              style = "default",
+              size = "large"
+            )
+          )
         ),
-        
-        tabItem(tabName ="exploring",
-                h2('ANCOVA Interaction Plot'),
-                p("First, choose a dataset to explore. Then, adjust the inputs in 
-                order to see how they affect the outcome. See how the P-value 
-                relates to the interaction plot. When you're done exploring, click
-                  the Play button to test your knowledge in the matching game."),
-                sidebarLayout(
-                  sidebarPanel(
-                    selectInput(
-                      inputId = 'menu1',
-                      label = 'Select the Data',
-                      choices = c('Otter',
-                                  'Diet',
-                                  'Random')
-                    ),
-                    conditionalPanel(
-                      condition = "input.menu1 == 'Diet'",
-                      radioButtons(
-                        inputId = 'select_conti', 
-                        label = 'Select Continous Variable',
-                        inline = TRUE, 
-                        choices = c('Age',
-                                    'Height',
-                                    'Pre-diet Weight'), 
-                        selected = 'Age'
-                      ),
-                      radioButtons(
-                        inputId = 'select_covar', 
-                        label = 'Select Covariance',
-                        inline = TRUE,
-                        choices = c('Gender',
-                                    'Diet'), 
-                        selected = 'Gender'
-                      )
-                    ),
-                    conditionalPanel(
-                      condition = "input.menu1 == 'Random'",
-                      sliderInput(
-                        inputId = 'slope1',
-                        label = 'Change the slope of Line A',
-                        min = -5,
-                        max = 5,
-                        value = 0,
-                        step = 1)
-                      ,
-                      sliderInput(
-                        inputId = 'slope2',
-                        label = 'Change the slope of Line B',
-                        min = -5,
-                        max = 5,
-                        value = 0,
-                        step = 1
-                      ),
-                      sliderInput(
-                        inputId = 'inter1',
-                        label = 'Change the intersection of Line A',
-                        min = -5,
-                        max = 5,
-                        value = 0,
-                        step = 1
-                      ),
-                      sliderInput(
-                        inputId = 'inter2',
-                        label = 'Change the intersection of Line B',
-                        min = -5,
-                        max = 5,
-                        value = 0,
-                        step = 1
-                      ),
-                      sliderInput(
-                        inputId = 'sample',
-                        label = 'Change the sample size',
-                        min = 100,
-                        max = 800,
-                        value = 100,
-                        step = 50
-                      )
-                    ),
-                    fluidRow(
-                      uiOutput('p'),
-                      align = "left"),
-                    conditionalPanel(
-                      condition = "input.menu1 != 'Random'",
-                      downloadButton(
-                        outputId = "downloadData", 
-                        label = "Download the Dataset",
-                        icon = shiny::icon("download")
-                      )
-                    )
-                  ),
-                  
-                  mainPanel(
-                    plotOutput('plot_gg'),
-                    tags$b(verbatimTextOutput('analysis1')),
-                    )
-                  ),
-                  fluidRow(
-                    div(style = "text-align: center",
-                        bsButton(inputId = "game",
-                                 label = "Play!",
-                                 icon = icon("bolt"),
-                                 style = "default",
-                                 size = "large")
-                  )
-                )
+        ### Explore page ----
+        tabItem(
+          tabName = "exploring",
+          h2('ANCOVA Interaction Plot'),
+          p("An important plot to explore for ANCOVA is an interaction plot. That
+            is, a plot with which you can explore whether or not there is any type
+            of interaction between your categorical factors and your continuous
+            predictors."),
+          p("To explore interaction plots, you'll first need to choose a dataset
+            to explore. Then, adjust the inputs (if applicable) to see how they 
+            affect the outcome. See how the p-value relates to the interaction
+            plot. When you're done exploring, click the Play button to test your
+            knowledge in the matching game."),
+          sidebarLayout(
+            sidebarPanel(
+              selectInput(
+                inputId = 'menu1',
+                label = 'Select the Data',
+                choices = c('Otter',
+                            'Diet',
+                            'Random')
+              ),
+              conditionalPanel(
+                condition = "input.menu1 == 'Diet'",
+                radioButtons(
+                  inputId = 'select_conti', 
+                  label = 'Select Continous Variable',
+                  inline = TRUE, 
+                  choices = c('Age',
+                              'Height',
+                              'Pre-diet Weight'), 
+                  selected = 'Age'
                 ),
+                radioButtons(
+                  inputId = 'select_covar', 
+                  label = 'Select Covariance',
+                  inline = TRUE,
+                  choices = c('Gender',
+                              'Diet'), 
+                  selected = 'Gender'
+                )
+              ),
+              conditionalPanel(
+                condition = "input.menu1 == 'Random'",
+                sliderInput(
+                  inputId = 'slope1',
+                  label = 'Change the slope of Line A',
+                  min = -5,
+                  max = 5,
+                  value = 0,
+                  step = 1)
+                ,
+                sliderInput(
+                  inputId = 'slope2',
+                  label = 'Change the slope of Line B',
+                  min = -5,
+                  max = 5,
+                  value = 0,
+                  step = 1
+                ),
+                sliderInput(
+                  inputId = 'inter1',
+                  label = 'Change the intersection of Line A',
+                  min = -5,
+                  max = 5,
+                  value = 0,
+                  step = 1
+                ),
+                sliderInput(
+                  inputId = 'inter2',
+                  label = 'Change the intersection of Line B',
+                  min = -5,
+                  max = 5,
+                  value = 0,
+                  step = 1
+                ),
+                sliderInput(
+                  inputId = 'sample',
+                  label = 'Change the sample size',
+                  min = 100,
+                  max = 800,
+                  value = 100,
+                  step = 50
+                )
+              ),
+              fluidRow(
+                uiOutput('p'),
+                align = "left"),
+              conditionalPanel(
+                condition = "input.menu1 != 'Random'",
+                downloadButton(
+                  outputId = "downloadData", 
+                  label = "Download the Dataset",
+                  icon = shiny::icon("download")
+                )
+              )
+            ),
+            
+            mainPanel(
+              plotOutput('plot_gg'),
+              tags$b(verbatimTextOutput('analysis1')),
+            )
+          ),
+          fluidRow(
+            div(style = "text-align: center",
+                bsButton(inputId = "game",
+                         label = "Play!",
+                         icon = icon("bolt"),
+                         style = "default",
+                         size = "large")
+            )
+          )
+        ),
         tabItem(tabName='game',
                 h2("Matching Game"),
                 p("Drag the items in each column so that the plots in the first column
@@ -463,7 +422,7 @@ ui <- list(
                   #   uiOutput("score")
                   # )
                 ),
-                ),
+        ),
         tabItem(
           tabName = "refs",
           withMathJax(),
@@ -546,8 +505,8 @@ ui <- list(
           br(),
           boastUtils::copyrightInfo()
         )
-        )
       )
+    )
   )
 )
 
