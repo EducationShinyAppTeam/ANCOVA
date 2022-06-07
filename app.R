@@ -314,17 +314,6 @@ ui <- list(
                   value = 100,
                   step = 50
                 )
-              ),
-              fluidRow(
-                uiOutput('p'),
-                align = "left"),
-              conditionalPanel(
-                condition = "input.menu1 != 'Random'",
-                downloadButton(
-                  outputId = "downloadData", 
-                  label = "Download the Dataset",
-                  icon = shiny::icon("download")
-                )
               )
             ),
             
