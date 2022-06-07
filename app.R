@@ -368,7 +368,7 @@ ui <- list(
                   ),
                   column(
                     width = 1,
-                    p("1st Positions:")
+                    p("1st Position:")
                   ),
                   column(
                     width = 1,
@@ -376,7 +376,7 @@ ui <- list(
                   ),
                   column(
                     width = 1,
-                    p("2nd Positions:")
+                    p("2nd Position:")
                   ),
                   column(
                     width = 1,
@@ -384,7 +384,7 @@ ui <- list(
                   ),
                   column(
                     width = 1,
-                    p("3rd Positions:")
+                    p("3rd Position:")
                   ),
                   column(
                     width = 1,
