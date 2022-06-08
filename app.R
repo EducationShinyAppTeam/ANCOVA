@@ -451,7 +451,7 @@ ui <- list(
           ),
           p(
             class = "hangingindent",
-            "Hijmans, Robert J. (2021). raster: Geographic Data Analysis and Modeling. 
+            "Hijmans, R. J. (2021). raster: Geographic Data Analysis and Modeling. 
             (v3.4-10) [R Package]. Available from https://CRAN.R-project.org/package=raster"
           ),
           p(
