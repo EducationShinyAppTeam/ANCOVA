@@ -418,10 +418,6 @@ ui <- list(
           h2("References"),
           p(
             class = "hangingindent",
-            "https://educationshinyappteam.github.io/Style_Guide/index.html#organization"
-          ),
-          p(
-            class = "hangingindent",
             "Bailey, E. (2015). shinyBS: Twitter bootstrap components for shiny. 
             (v0.61). [R package]. Available from https://CRAN.R-project.org/package=shinyBS"
           ),
@@ -444,7 +440,7 @@ ui <- list(
           ),
           p(
             class = "hangingindent",
-            "de Vries, Andrie (2020). sortable: Drag-and-Drop in 'shiny' Apps with
+            "de Vries, A. (2020). sortable: Drag-and-Drop in 'shiny' Apps with
             'SortableJS'. (v0.4.4) [R Package]. Available from 
             https://CRAN.R-project.org/package=sortable"
           ),
@@ -655,7 +651,7 @@ server <- function(input, output, session) {
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
-          xlab("Age") + 
+          xlab("Age (year)") + 
           ylab("Decrease in Weight") +
           theme(text = element_text(size=20),
                 panel.grid.major = element_blank(), 
