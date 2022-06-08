@@ -428,7 +428,7 @@ ui <- list(
           ),
           p(
             class = "hangingindent",
-            "Chang, W. and Borges Ribeio, B. (2018). shinydashboard: Create dashboards 
+            "Chang, W. and Borges, R. B. (2018). shinydashboard: Create dashboards 
             with 'Shiny'. (v0.7.1) [R Package]. 
             Available from https://CRAN.R-project.org/package=shinydashboard"
           ),
