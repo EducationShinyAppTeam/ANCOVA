@@ -477,14 +477,6 @@ ui <- list(
             A Grammar of Data Manipulation. (v1.0.6) [R package] Available from 
             https://cran.r-project.org/package=dplyr"
           ),
-          p(
-            class = "hangingindent",
-            "https://www.sheffield.ac.uk/mash/data"
-          ),
-          p(
-            class = "hangingindent",
-            "https://github.com/dzchilds"
-          ),
           br(),
           br(),
           br(),
