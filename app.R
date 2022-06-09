@@ -651,8 +651,8 @@ server <- function(input, output, session) {
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
-          xlab("Age (year)") + 
-          ylab("Decrease in Weight") +
+          xlab("Age") + 
+          ylab("Decrease in Weight (kg)") +
           theme(text = element_text(size=20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
@@ -666,8 +666,8 @@ server <- function(input, output, session) {
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
-          xlab("Height") + 
-          ylab("Decrease in Weight") +
+          xlab("Height (cm)") + 
+          ylab("Decrease in Weight (kg)") +
           theme(text = element_text(size=20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
@@ -681,8 +681,8 @@ server <- function(input, output, session) {
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
-          xlab("Pre-diet Weight") + 
-          ylab("Decrease in Weight") +
+          xlab("Pre-diet Weight (kg)") + 
+          ylab("Decrease in Weight (kg)") +
           theme(text = element_text(size=20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
@@ -696,8 +696,8 @@ server <- function(input, output, session) {
                    colour =Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
-          xlab("Age") + 
-          ylab("Decrease in Weight") +
+          xlab("Age (year)") + 
+          ylab("Decrease in Weight (kg)") +
           theme(text = element_text(size=20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
@@ -711,8 +711,8 @@ server <- function(input, output, session) {
                    colour = Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
-          xlab("Height") + 
-          ylab("Decrease in Weight") +
+          xlab("Height (cm)") + 
+          ylab("Decrease in Weight (kg)") +
           theme(text = element_text(size=20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
@@ -726,8 +726,8 @@ server <- function(input, output, session) {
                    colour = Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
-          xlab("Pre-diet Weight") + 
-          ylab("Decrease in Weight") +
+          xlab("Pre-diet Weight (kg)") + 
+          ylab("Decrease in Weight (kg)") +
           theme(text = element_text(size=20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
