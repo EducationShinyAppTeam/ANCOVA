@@ -440,6 +440,11 @@ ui <- list(
           ),
           p(
             class = "hangingindent",
+            "Childs, D. (2016) Otters.csv [dataset]. Available from 
+            https://www.sheffield.ac.uk/polopoly_fs/1.570199!/file/stcp-Rdataset-Diet.csv."
+          ),
+          p(
+            class = "hangingindent",
             "de Vries, A. (2020). sortable: Drag-and-Drop in 'shiny' Apps with
             'SortableJS'. (v0.4.4) [R Package]. Available from 
             https://CRAN.R-project.org/package=sortable"
@@ -461,9 +466,14 @@ ui <- list(
           ),
           p(
             class = "hangingindent",
-            "Perrier, V., Meyer, F., Granjon, D. (2019). shinyWidgets: Custom inputs 
-            widgets for shiny. (v0.5.0) [R Package]. Available from 
+            "Perrier, V., Meyer, F., Granjon, D. (2019). shinyWidgets: Custom in
+            puts widgets for shiny. (v0.5.0) [R Package]. Available from 
             https://CRAN.R-project.org/package=shinyWidgets"
+          ),
+          p(
+            class = "hangingindent",
+            "The University of Sheffield (n.d.) Diet.csv [dataset]. Available from 
+            https://www.sheffield.ac.uk/polopoly_fs/1.570199!/file/stcp-Rdataset-Diet.csv."
           ),
           p(
             class = "hangingindent",
