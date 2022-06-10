@@ -1,6 +1,6 @@
 Title: ANCOVA
 ShortName: ANCOVA
-Date: 2021-05-13
+Date: 2022-06-10
 Lifecycle: experimental
 Authors@R: c(
     person(given = "Luxin", family = "Wang", role = c("aut", "cre")),
@@ -8,6 +8,7 @@ Authors@R: c(
     person(given = "Lydia", family = "Bednarczyk", email = "ljb5670@psu.edu", role = c("aut")),
     person(given = "Dennis", family = "Pearl", role = c("aut")),
     person(given = "Neil", family = "Hatfield", role = c("aut"))
+    person(given = "Phichchaya", family = "Sutaporn", role = c("aut"))
   )
 Chapter: Chapter 7
 Description: This app introduces the concept of ANCOVA focusing on interpreting interaction plots.
