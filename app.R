@@ -94,7 +94,7 @@ ui <- list(
             boastUtils::citeApp(),
             br(),
             br(),
-            div(class = "updated", "Last Update: 12/3/2021 by NJH.")
+            div(class = "updated", "Last Update: 06/13/2022 by Phichchaya Sutaporn.")
           )
         ),
         ### Prerequisites page ----
