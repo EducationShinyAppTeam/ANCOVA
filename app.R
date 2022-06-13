@@ -86,7 +86,7 @@ ui <- list(
           br(),
           h2('Acknowledgements'),
           p("This app was developed and coded by Luxin Wang and modified by
-            Zhiruo Wang and Lydia Bednarczyk.",
+            Zhiruo Wang, Lydia Bednarczyk, and Phichchaya Sutaporn.",
             br(),
             br(),
             "Cite this app as:",
@@ -441,7 +441,7 @@ ui <- list(
           p(
             class = "hangingindent",
             "Childs, D. (2016) Otters.csv [dataset]. Available from 
-            https://www.sheffield.ac.uk/polopoly_fs/1.570199!/file/stcp-Rdataset-Diet.csv."
+            https://www.sheffield.ac.uk/polopoly_fs/1.570199!/file/stcp-Rdataset-Diet.csv"
           ),
           p(
             class = "hangingindent",
@@ -473,7 +473,7 @@ ui <- list(
           p(
             class = "hangingindent",
             "The University of Sheffield (n.d.) Diet.csv [dataset]. Available from 
-            https://www.sheffield.ac.uk/polopoly_fs/1.570199!/file/stcp-Rdataset-Diet.csv."
+            https://www.sheffield.ac.uk/polopoly_fs/1.570199!/file/stcp-Rdataset-Diet.csv"
           ),
           p(
             class = "hangingindent",

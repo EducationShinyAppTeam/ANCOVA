@@ -7,7 +7,7 @@ Authors@R: c(
     person(given = "Zhiruo", family = "Wang", role = c("aut")),
     person(given = "Lydia", family = "Bednarczyk", email = "ljb5670@psu.edu", role = c("aut")),
     person(given = "Dennis", family = "Pearl", role = c("aut")),
-    person(given = "Neil", family = "Hatfield", role = c("aut"))
+    person(given = "Neil", family = "Hatfield", role = c("aut")),
     person(given = "Phichchaya", family = "Sutaporn", role = c("ctb"))
   )
 Chapter: Chapter 7
