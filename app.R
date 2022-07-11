@@ -127,11 +127,11 @@ ui <- list(
                 tags$td("Categorical Factor"),
                 tags$td("ANOVA"),
                 tags$td("ANOVA is used for comparing three or more group means.",
-                        tags$br(),
+                        tags$strong(),
                         "Different groups are different levels of categorical
                         variables, and group means are calculated from continuous 
                         variables.", 
-                        tags$br(), 
+                        tags$strong(), 
                         "Example: Can differences between the average scores of
                         three STAT 200 sections be explained by chance?")
               ),
@@ -141,10 +141,10 @@ ui <- list(
                 tags$td("Regression"),
                 tags$td("Regression is used for determining the relationship 
                         between two continuous variables.",
-                        tags$br(),
+                        tags$strong(),
                         "One dependent variable (Y) can also be affected by 
                         multiple independent variables (X).", 
-                        tags$br(), 
+                        tags$strong(), 
                         "Example: How will crime rate be impacted by population 
                         density, unemployment rate, and income?")
               ),
@@ -154,10 +154,10 @@ ui <- list(
                 tags$td("ANCOVA"),
                 tags$td("ANCOVA is used by adding continuous variables onto ANOVA 
                         analysis, which is called covariate.",
-                        tags$br(),
+                        tags$strong(),
                         "Differences between group means and relationships between 
                         continuous variables are both analyzed.", 
-                        tags$br(), 
+                        tags$strong(), 
                        "Example: Who makes the most money? Will gender or 
                         years after graduation influence the income?")
               )
@@ -586,27 +586,27 @@ server <- function(input, output, session) {
                  data = diet)
   
   diet.model2<-lm(abChange ~ Age + gender + Age:gender,
-                  data=diet)
+                  data = diet)
   pred.data2 <- expand.grid(Age = 16:60, gender = c("M", "F"))
   pred.data2 <- mutate(pred.data2, abChange = predict(diet.model2, pred.data2))
   
   diet.model3 <- lm(abChange ~ Height + gender + Height:gender,
-                    data=diet)
+                    data = diet)
   pred.data3 <- expand.grid(Height = 141:201, gender = c("M", "F"))
   pred.data3 <- mutate(pred.data3, abChange = predict(diet.model3, pred.data3))
   
   diet.model4 <- lm(abChange ~ pre.weight + gender + pre.weight:gender,
-                    data=diet)
+                    data = diet)
   pred.data4 <- expand.grid(pre.weight = 58:103, gender = c("M", "F"))
   pred.data4 <- mutate(pred.data4, abChange = predict(diet.model4, pred.data4))
   
   diet.model5 <- lm(abChange ~ Age + Diet + Age:Diet,
-                    data=diet)
+                    data = diet)
   pred.data5 <- expand.grid(Age = 16:60, Diet = c('1','2','3'))
   pred.data5 <- mutate(pred.data5, abChange = predict(diet.model5, pred.data5))
   
   diet.model6 <- lm(abChange ~ Height + Diet + Height:Diet,
-                    data=diet)
+                    data = diet)
   pred.data6 <- expand.grid(Height = 141:201, Diet = c('1','2','3'))
   pred.data6 <- mutate(pred.data6, abChange = predict(diet.model6, pred.data6))
   
@@ -618,7 +618,7 @@ server <- function(input, output, session) {
   
   
   ###save random model
-  rand <- reactiveValues(randMod=NULL)
+  rand <- reactiveValues(randMod = NULL)
   
   ###Graph the plot of interaction###
   
@@ -648,7 +648,7 @@ server <- function(input, output, session) {
           geom_point(data = diet) + 
           xlab("Age") + 
           ylab("Decrease in Weight (kg)") +
-          theme(text = element_text(size=20),
+          theme(text = element_text(size = 20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
                 panel.background = element_blank(), 
@@ -678,7 +678,7 @@ server <- function(input, output, session) {
           geom_point(data = diet) + 
           xlab("Pre-diet Weight (kg)") + 
           ylab("Decrease in Weight (kg)") +
-          theme(text = element_text(size=20),
+          theme(text = element_text(size = 20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
                 panel.background = element_blank(), 
@@ -688,12 +688,12 @@ server <- function(input, output, session) {
         ggplot(pred.data5, 
                aes(x = Age, 
                    y = abChange, 
-                   colour =Diet)) + 
+                   colour = Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
           xlab("Age (year)") + 
           ylab("Decrease in Weight (kg)") +
-          theme(text = element_text(size=20),
+          theme(text = element_text(size = 20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
                 panel.background = element_blank(), 
@@ -708,7 +708,7 @@ server <- function(input, output, session) {
           geom_point(data = diet) + 
           xlab("Height (cm)") + 
           ylab("Decrease in Weight (kg)") +
-          theme(text = element_text(size=20),
+          theme(text = element_text(size = 20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
                 panel.background = element_blank(), 
@@ -723,7 +723,7 @@ server <- function(input, output, session) {
           geom_point(data = diet) + 
           xlab("Pre-diet Weight (kg)") + 
           ylab("Decrease in Weight (kg)") +
-          theme(text = element_text(size=20),
+          theme(text = element_text(size = 20),
                 panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(),
                 panel.background = element_blank(), 
@@ -761,7 +761,7 @@ server <- function(input, output, session) {
                      formula = "inter + X * slope", 
                      variance = 11)
       
-      def2<- defData(varname = "inter", 
+      def2 <- defData(varname = "inter", 
                      dist = "nonrandom", 
                      formula = b, 
                      id = "id")
@@ -789,7 +789,7 @@ server <- function(input, output, session) {
       
       comb <- rbind(dt,dt2)
       
-      aov.model <- lm(Y~X+cov+cov:X, data=comb)
+      aov.model <- lm(Y~X+cov+cov:X, data = comb)
       
       pred.aov <- expand.grid(X = 0:20, 
                               cov = c("A","B"))
@@ -804,7 +804,7 @@ server <- function(input, output, session) {
         geom_point(data = comb) + 
         xlab("X") + 
         ylab("Y") +
-        theme(text = element_text(size=20),
+        theme(text = element_text(size = 20),
               panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank(),
               panel.background = element_blank(), 
@@ -893,7 +893,7 @@ server <- function(input, output, session) {
       
       comb <- rbind(dt,dt2)
       
-      aov.model <- lm(Y~X+cov+cov:X, data=comb)
+      aov.model <- lm(Y~X+cov+cov:X, data = comb)
       
       ##testing passing the model
       rand$randMod <- anova(aov.model)[3, "Pr(>F)"]
