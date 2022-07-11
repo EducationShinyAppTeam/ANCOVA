@@ -7,13 +7,19 @@ library(shinydashboard)
 library(simstudy)
 library(shinyWidgets)
 library(boastUtils)
-library(fontawesome)
-# library(sortable)
+library(sortable)
 
 # Set constants ----
 maxScore <- 10
 
-# Load data ? ----
+# Load data ----
+seaotters <- read.csv("Otter.csv",header=T)
+
+diet <- read.csv("Diet.csv",header=T)
+diet$Diet<-as.character(diet$Diet)
+
+bank = read.csv("questionbank.csv")
+bank = data.frame(lapply(bank, as.character), stringsAsFactors = FALSE)
 
 # Define UI ----
 ui <- list(
@@ -255,8 +261,8 @@ ui <- list(
               conditionalPanel(
                 condition = "input.menu1 == 'Diet'",
                 radioButtons(
-                  inputId = 'select_conti', 
-                  label = 'Select Continous Variable',
+                  inputId = 'selectConti', 
+                  label = 'Select Continuous Variable',
                   inline = TRUE, 
                   choices = c('Age',
                               'Height',
@@ -264,8 +270,8 @@ ui <- list(
                   selected = 'Age'
                 ),
                 radioButtons(
-                  inputId = 'select_covar', 
-                  label = 'Select Covariance',
+                  inputId = 'selectCovar', 
+                  label = 'Select Covariate',
                   inline = TRUE,
                   choices = c('Gender',
                               'Diet'), 
@@ -318,7 +324,7 @@ ui <- list(
             ),
             
             mainPanel(
-              plotOutput('plot_gg'),
+              plotOutput('plotGg'),
               tags$b(verbatimTextOutput('analysis1')),
             )
           ),
@@ -332,6 +338,7 @@ ui <- list(
             )
           )
         ),
+        ### Game page ----
         tabItem(tabName='game',
                 h2("Matching Game"),
                 p("Drag the items in each column so that the plots in the first column
@@ -461,11 +468,6 @@ ui <- list(
           ),
           p(
             class = "hangingindent",
-            "Iannone, R. (2021). fontawesome: Easily work with 'Font Awesome' Icons.
-            (v0.2.1) [R Package]. Available from https://CRAN.R-project.org/package=fontawesome"
-          ),
-          p(
-            class = "hangingindent",
             "Perrier, V., Meyer, F., Granjon, D. (2019). shinyWidgets: Custom in
             puts widgets for shiny. (v0.5.0) [R Package]. Available from 
             https://CRAN.R-project.org/package=shinyWidgets"
@@ -498,15 +500,6 @@ ui <- list(
 )
 
 
-
-seaotters <- read.csv("Otter.csv",header=T)
-
-diet <- read.csv("Diet.csv",header=T)
-diet$Diet<-as.character(diet$Diet)
-
-bank = read.csv("questionbank.csv")
-bank = data.frame(lapply(bank, as.character), stringsAsFactors = FALSE)
-
 #Server ----
 server <- function(input, output, session) {
   observeEvent(
@@ -514,8 +507,8 @@ server <- function(input, output, session) {
     handlerExpr = {
       sendSweetAlert(
         session = session,
-        title = "Instructions:",
-        type = NULL,
+        title = "Instructions",
+        type = info,
         closeOnClickOutside = TRUE,
         text = "Pick a data set and variables to view the interaction plot and the 
       associated ANOVA table."
@@ -587,49 +580,49 @@ server <- function(input, output, session) {
   pred.data <- mutate(pred.data, 
                       Otters = predict(otters.model, pred.data))
   
-  diet.model<-lm(ab_change ~ gender + Diet + Age + Height + pre.weight + gender:Age 
+  diet.model<-lm(abChange ~ gender + Diet + Age + Height + pre.weight + gender:Age 
                  + gender:Height + gender:pre.weight + Diet:Age + Diet:Height + 
                    Diet:pre.weight,
                  data = diet)
   
-  diet.model2<-lm(ab_change ~ Age + gender + Age:gender,
+  diet.model2<-lm(abChange ~ Age + gender + Age:gender,
                   data=diet)
   pred.data2 <- expand.grid(Age = 16:60, gender = c("M", "F"))
-  pred.data2 <- mutate(pred.data2, ab_change = predict(diet.model2, pred.data2))
+  pred.data2 <- mutate(pred.data2, abChange = predict(diet.model2, pred.data2))
   
-  diet.model3 <- lm(ab_change ~ Height + gender + Height:gender,
+  diet.model3 <- lm(abChange ~ Height + gender + Height:gender,
                     data=diet)
   pred.data3 <- expand.grid(Height = 141:201, gender = c("M", "F"))
-  pred.data3 <- mutate(pred.data3, ab_change = predict(diet.model3, pred.data3))
+  pred.data3 <- mutate(pred.data3, abChange = predict(diet.model3, pred.data3))
   
-  diet.model4 <- lm(ab_change ~ pre.weight + gender + pre.weight:gender,
+  diet.model4 <- lm(abChange ~ pre.weight + gender + pre.weight:gender,
                     data=diet)
   pred.data4 <- expand.grid(pre.weight = 58:103, gender = c("M", "F"))
-  pred.data4 <- mutate(pred.data4, ab_change = predict(diet.model4, pred.data4))
+  pred.data4 <- mutate(pred.data4, abChange = predict(diet.model4, pred.data4))
   
-  diet.model5 <- lm(ab_change ~ Age + Diet + Age:Diet,
+  diet.model5 <- lm(abChange ~ Age + Diet + Age:Diet,
                     data=diet)
   pred.data5 <- expand.grid(Age = 16:60, Diet = c('1','2','3'))
-  pred.data5 <- mutate(pred.data5, ab_change = predict(diet.model5, pred.data5))
+  pred.data5 <- mutate(pred.data5, abChange = predict(diet.model5, pred.data5))
   
-  diet.model6 <- lm(ab_change ~ Height + Diet + Height:Diet,
+  diet.model6 <- lm(abChange ~ Height + Diet + Height:Diet,
                     data=diet)
   pred.data6 <- expand.grid(Height = 141:201, Diet = c('1','2','3'))
-  pred.data6 <- mutate(pred.data6, ab_change = predict(diet.model6, pred.data6))
+  pred.data6 <- mutate(pred.data6, abChange = predict(diet.model6, pred.data6))
   
   
-  diet.model7 <- lm(ab_change ~ pre.weight + Diet + pre.weight:Diet,
+  diet.model7 <- lm(abChange ~ pre.weight + Diet + pre.weight:Diet,
                     data = diet)
   pred.data7 <- expand.grid(pre.weight = 58:103, Diet = c('1','2','3'))
-  pred.data7 <- mutate(pred.data7, ab_change = predict(diet.model7, pred.data7))
+  pred.data7 <- mutate(pred.data7, abChange = predict(diet.model7, pred.data7))
   
   
   ###save random model
-  rand <- reactiveValues(rand_mod=NULL)
+  rand <- reactiveValues(randMod=NULL)
   
   ###Graph the plot of interaction###
   
-  output$plot_gg <- renderPlot(
+  output$plotGg <- renderPlot(
     if (input$menu1 == 'Otter') {
       ggplot(pred.data, 
              aes(x = Year, 
@@ -646,10 +639,10 @@ server <- function(input, output, session) {
               axis.line = element_line(colour = "black"))
     }
     else if (input$menu1 == 'Diet') {
-      if (input$select_conti == 'Age' & input$select_covar == 'Gender') {
+      if (input$selectConti == 'Age' & input$selectCovar == 'Gender') {
         ggplot(pred.data2, 
                aes(x = Age, 
-                   y = ab_change, 
+                   y = abChange, 
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -661,10 +654,10 @@ server <- function(input, output, session) {
                 panel.background = element_blank(), 
                 axis.line = element_line(colour = "black"))
       }
-      else if (input$select_conti == 'Height' & input$select_covar == 'Gender') {
+      else if (input$selectConti == 'Height' & input$selectCovar == 'Gender') {
         ggplot(pred.data3, 
                aes(x = Height, 
-                   y = ab_change, 
+                   y = abChange, 
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -676,10 +669,10 @@ server <- function(input, output, session) {
                 panel.background = element_blank(), 
                 axis.line = element_line(colour = "black"))
       }
-      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Gender') {
+      else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Gender') {
         ggplot(pred.data4, 
                aes(x = pre.weight, 
-                   y = ab_change, 
+                   y = abChange, 
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -691,10 +684,10 @@ server <- function(input, output, session) {
                 panel.background = element_blank(), 
                 axis.line = element_line(colour = "black"))
       }
-      else if (input$select_conti == 'Age' & input$select_covar=='Diet') {
+      else if (input$selectConti == 'Age' & input$selectCovar=='Diet') {
         ggplot(pred.data5, 
                aes(x = Age, 
-                   y = ab_change, 
+                   y = abChange, 
                    colour =Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -706,10 +699,10 @@ server <- function(input, output, session) {
                 panel.background = element_blank(), 
                 axis.line = element_line(colour = "black"))
       }
-      else if (input$select_conti == 'Height' & input$select_covar == 'Diet') {
+      else if (input$selectConti == 'Height' & input$selectCovar == 'Diet') {
         ggplot(pred.data6, 
                aes(x = Height, 
-                   y = ab_change, 
+                   y = abChange, 
                    colour = Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -721,10 +714,10 @@ server <- function(input, output, session) {
                 panel.background = element_blank(), 
                 axis.line = element_line(colour = "black"))
       }
-      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Diet') {
+      else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Diet') {
         ggplot(pred.data7, 
                aes(x = pre.weight, 
-                   y = ab_change, 
+                   y = abChange, 
                    colour = Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -825,22 +818,22 @@ server <- function(input, output, session) {
       anova(otters.model)
       }
     else if (input$menu1 == 'Diet') {
-      if (input$select_conti == 'Age' & input$select_covar == 'Gender'){
+      if (input$selectConti == 'Age' & input$selectCovar == 'Gender'){
         anova(diet.model2)
         }
-      else if (input$select_conti == 'Height' & input$select_covar == 'Gender'){
+      else if (input$selectConti == 'Height' & input$selectCovar == 'Gender'){
         anova(diet.model3)
         }
-      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Gender'){
+      else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Gender'){
         anova(diet.model4)
         }
-      else if (input$select_conti == 'Age' & input$select_covar == 'Diet'){
+      else if (input$selectConti == 'Age' & input$selectCovar == 'Diet'){
         anova(diet.model5)
         }
-      else if (input$select_conti == 'Height' & input$select_covar == 'Diet'){
+      else if (input$selectConti == 'Height' & input$selectCovar == 'Diet'){
         anova(diet.model6)
         }
-      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Diet'){
+      else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Diet'){
         anova(diet.model7)
         }
     }
@@ -903,7 +896,7 @@ server <- function(input, output, session) {
       aov.model <- lm(Y~X+cov+cov:X, data=comb)
       
       ##testing passing the model
-      rand$rand_mod <- anova(aov.model)[3, "Pr(>F)"]
+      rand$randMod <- anova(aov.model)[3, "Pr(>F)"]
       
       anova(aov.model)
     }
@@ -917,27 +910,27 @@ server <- function(input, output, session) {
       var$p <- as.numeric(anova(otters.model)[3,"Pr(>F)"])
       }
     else if (input$menu1 == 'Diet'){
-      if (input$select_conti == 'Age' & input$select_covar == 'Gender'){
+      if (input$selectConti == 'Age' & input$selectCovar == 'Gender'){
         var$p <- as.numeric(anova(diet.model2)[3,"Pr(>F)"])
         }
-      else if (input$select_conti == 'Height' & input$select_covar == 'Gender'){
+      else if (input$selectConti == 'Height' & input$selectCovar == 'Gender'){
         var$p <- as.numeric(anova(diet.model3)[3,"Pr(>F)"])
         }
-      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Gender'){
+      else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Gender'){
         var$p <- as.numeric(anova(diet.model4)[3,"Pr(>F)"])
         }
-      else if (input$select_conti == 'Age' & input$select_covar == 'Diet'){
+      else if (input$selectConti == 'Age' & input$selectCovar == 'Diet'){
         var$p <- as.numeric(anova(diet.model5)[3,"Pr(>F)"])
         }
-      else if (input$select_conti == 'Height' & input$select_covar == 'Diet'){
+      else if (input$selectConti == 'Height' & input$selectCovar == 'Diet'){
         var$p <- as.numeric(anova(diet.model6)[3,"Pr(>F)"])
         }
-      else if (input$select_conti == 'Pre-diet Weight' & input$select_covar == 'Diet'){
+      else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Diet'){
         var$p <- as.numeric(anova(diet.model7)[3,"Pr(>F)"])
         }
     }
     else if (input$menu1 == 'Random'){
-      var$p <- as.numeric(rand$rand_mod)
+      var$p <- as.numeric(rand$randMod)
       }
   })
   
