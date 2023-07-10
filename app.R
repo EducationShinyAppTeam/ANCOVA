@@ -8,6 +8,7 @@ library(simstudy)
 library(shinyWidgets)
 library(boastUtils)
 library(sortable)
+library(DT)
 
 # Set constants ----
 maxScore <- 10
@@ -107,11 +108,13 @@ ui <- list(
         tabItem(
           tabName = "prereq",
           h2('Prerequisites'),
-          p("What is ANCOVA? ANCOVA (Analysis of Covariance) is the Analysis of 
-            Variance (ANOVA) with at least one continuous variables included in
+          p('What is ANCOVA? ANCOVA (Analysis of Covariance) is the Analysis of 
+            Variance (',
+             a(href = 'https://psu-eberly.shinyapps.io/ANOVA_Models/', 
+              'ANOVA', class = 'bodylinks'), ') with at least one continuous variables included in
             the model. The information below will explain highlight the differences
-            between ANOVA, Regression, and ANCOVA."),
-          br(),
+            between ANOVA, Regression, and ANCOVA.'),
+            
           tags$table(
             tags$thead(
               tags$tr(
@@ -164,67 +167,14 @@ ui <- list(
             )
           ),
           br(),
-          h3('Diagnostic Plots'),
-          p('Model checking is a critical part of an analysis. You need to 
-            understand these four diagnostic plots. In order to gain a better
+          h3('Assumption of ANCOVA'),
+          p('Model checking is a critical part of an analysis. If you need to 
+            understand assumptions of ANCOVA with diagnostic plots. In order to gain a better
             understanding of what properties of the plots satisfy the assumptions,
             look at the',
             a(href = 'https://psu-eberly.shinyapps.io/Assumptions_of_ANOVA/', 
               'Assumptions of ANOVA', class = 'bodylinks'), 'app.'),
-          tags$ul(
-            tags$li('The Residuals vs Fitted plot checks the linear 
-                         pattern of residuals. If the linear model is correct, you 
-                                 should expect a roughly horizontal line.'),
-            tags$figure(
-              align = "center",
-              tags$img(
-                src = "residualsvsfitted.PNG",
-                width = 550,
-                alt = "Picture of residuals vs fitted plot"
-              ),
-              tags$figcaption("Residuals vs fitted plot.")
-            ),
-            br(),
-            tags$li('The Normal Q-Q plot checks normality. If the 
-                                 normality assumption is true, you should expect 
-                                 the dots to roughly follow a straight line.'),
-            tags$figure(
-              align = "center",
-              tags$img(
-                src = "normalqq.PNG",
-                width = 550,
-                alt = "Picture of normal QQ plot"
-              ),
-              tags$figcaption("Normal Q-Q plot for standardized residuals
-                                       with somewhat heavy tails.")
-            ),
-            br(),
-            tags$li('The Scale-Location plot checks for equal spread 
-                                 of the residuals. If the equal variance assumption 
-                                 is true, you should expect a roughly horizontal 
-                                 line with the dots showing equal spread.'),
-            tags$figure(
-              align = "center",
-              tags$img(
-                src = "scalelocation.PNG",
-                width = 550,
-                alt = "Picture of a scale location plot"
-              ),
-              tags$figcaption("Scale-location plot with slight fanning.")
-            ),
-            br(),
-            tags$li('The Residual vs Leverage plot checks for influential 
-                                 outliers. Outliers with high leverage will appear 
-                                 outside the dashed line range.'),
-            tags$figure(
-              align = "center",
-              tags$img(
-                src = "residualsvsleverage.PNG",
-                width = 550,
-                alt = "Picture of residuals vs leverage plot"
-              ),
-              tags$figcaption("Residuals vs leverage plot.")
-            )),
+          br(),
           div(
             style = "text-align: center;",
             bsButton(
@@ -325,9 +275,12 @@ ui <- list(
             
             mainPanel(
               plotOutput('plotGg'),
-              tags$b(verbatimTextOutput('analysis1')),
+              tags$b(dataTableOutput('analysis1')),
+              br(),
+              uiOutput('p')
             )
           ),
+          br(),
           fluidRow(
             div(style = "text-align: center",
                 bsButton(inputId = "game",
@@ -345,15 +298,20 @@ ui <- list(
                   are in the same order as their corresponding output in the second column. 
                   Then, click Submit to check your answers. Once all of your answers 
                   are correct, click New for a new set of plots."),
+                br(),
                 fluidRow(
                   column(
                     width = 6,
-                    uiOutput("plotCol")
+                    plotOutput("plot1"),
+                    plotOutput("plot2"),
+                    plotOutput("plot3")
                   ),
                   column(
                     width = 6,
                     offset = 0,
-                    uiOutput("outputCol")
+                    dataTableOutput("summary1"),
+                    dataTableOutput("summary2"),
+                    dataTableOutput("summary3")
                   )
                 ),
                 br(),
@@ -364,7 +322,7 @@ ui <- list(
                   ),
                   column(
                     width = 1,
-                    p("1st Position:")
+                    p("1st Positions:")
                   ),
                   column(
                     width = 1,
@@ -372,7 +330,7 @@ ui <- list(
                   ),
                   column(
                     width = 1,
-                    p("2nd Position:")
+                    p("2nd Positions:")
                   ),
                   column(
                     width = 1,
@@ -380,7 +338,7 @@ ui <- list(
                   ),
                   column(
                     width = 1,
-                    p("3rd Position:")
+                    p("3rd Positions:")
                   ),
                   column(
                     width = 1,
@@ -575,46 +533,53 @@ server <- function(input, output, session) {
   ###prep the data###
   otters.model <- lm(Otters ~ Location + Year + Location:Year, 
                      data = seaotters)
+  anovaOters <- round(anova(otters.model), 3)
   pred.data <- expand.grid(Year = 1992:2003, 
                            Location = c("Lagoon", "Bay"))
   pred.data <- mutate(pred.data, 
                       Otters = predict(otters.model, pred.data))
   
-  diet.model<-lm(abChange ~ gender + Diet + Age + Height + pre.weight + gender:Age 
+  diet.model<-lm(ab_change ~ gender + Diet + Age + Height + pre.weight + gender:Age 
                  + gender:Height + gender:pre.weight + Diet:Age + Diet:Height + 
                    Diet:pre.weight,
                  data = diet)
   
-  diet.model2<-lm(abChange ~ Age + gender + Age:gender,
+  diet.model2<-lm(ab_change ~ Age + gender + Age:gender,
                   data = diet)
+  anovaDiet2 <- round(anova(diet.model2), 3)
   pred.data2 <- expand.grid(Age = 16:60, gender = c("M", "F"))
-  pred.data2 <- mutate(pred.data2, abChange = predict(diet.model2, pred.data2))
+  pred.data2 <- mutate(pred.data2, ab_change = predict(diet.model2, pred.data2))
   
-  diet.model3 <- lm(abChange ~ Height + gender + Height:gender,
+  diet.model3 <- lm(ab_change ~ Height + gender + Height:gender,
                     data = diet)
+  anovaDiet3 <- round(anova(diet.model3), 3)
   pred.data3 <- expand.grid(Height = 141:201, gender = c("M", "F"))
-  pred.data3 <- mutate(pred.data3, abChange = predict(diet.model3, pred.data3))
+  pred.data3 <- mutate(pred.data3, ab_change = predict(diet.model3, pred.data3))
   
-  diet.model4 <- lm(abChange ~ pre.weight + gender + pre.weight:gender,
+  diet.model4 <- lm(ab_change ~ pre.weight + gender + pre.weight:gender,
                     data = diet)
+  anovaDiet4 <- round(anova(diet.model4), 3)
   pred.data4 <- expand.grid(pre.weight = 58:103, gender = c("M", "F"))
-  pred.data4 <- mutate(pred.data4, abChange = predict(diet.model4, pred.data4))
+  pred.data4 <- mutate(pred.data4, ab_change = predict(diet.model4, pred.data4))
   
-  diet.model5 <- lm(abChange ~ Age + Diet + Age:Diet,
+  diet.model5 <- lm(ab_change ~ Age + Diet + Age:Diet,
                     data = diet)
+  anovaDiet5 <- round(anova(diet.model5), 3)
   pred.data5 <- expand.grid(Age = 16:60, Diet = c('1','2','3'))
-  pred.data5 <- mutate(pred.data5, abChange = predict(diet.model5, pred.data5))
+  pred.data5 <- mutate(pred.data5, ab_change = predict(diet.model5, pred.data5))
   
-  diet.model6 <- lm(abChange ~ Height + Diet + Height:Diet,
+  diet.model6 <- lm(ab_change ~ Height + Diet + Height:Diet,
                     data = diet)
+  anovaDiet6 <- round(anova(diet.model6), 3)
   pred.data6 <- expand.grid(Height = 141:201, Diet = c('1','2','3'))
-  pred.data6 <- mutate(pred.data6, abChange = predict(diet.model6, pred.data6))
+  pred.data6 <- mutate(pred.data6, ab_change = predict(diet.model6, pred.data6))
   
   
-  diet.model7 <- lm(abChange ~ pre.weight + Diet + pre.weight:Diet,
+  diet.model7 <- lm(ab_change ~ pre.weight + Diet + pre.weight:Diet,
                     data = diet)
+  anovaDiet7 <- round(anova(diet.model7), 3)
   pred.data7 <- expand.grid(pre.weight = 58:103, Diet = c('1','2','3'))
-  pred.data7 <- mutate(pred.data7, abChange = predict(diet.model7, pred.data7))
+  pred.data7 <- mutate(pred.data7, ab_change = predict(diet.model7, pred.data7))
   
   
   ###save random model
@@ -636,13 +601,15 @@ server <- function(input, output, session) {
               panel.grid.major = element_blank(), 
               panel.grid.minor = element_blank(),
               panel.background = element_blank(), 
-              axis.line = element_line(colour = "black"))
+              axis.line = element_line(colour = "black"))+
+        labs(alt = "The plot is showing the number of otters along with different
+             years and locations.")
     }
     else if (input$menu1 == 'Diet') {
       if (input$selectConti == 'Age' & input$selectCovar == 'Gender') {
         ggplot(pred.data2, 
                aes(x = Age, 
-                   y = abChange, 
+                   y = ab_change, 
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -657,7 +624,7 @@ server <- function(input, output, session) {
       else if (input$selectConti == 'Height' & input$selectCovar == 'Gender') {
         ggplot(pred.data3, 
                aes(x = Height, 
-                   y = abChange, 
+                   y = ab_change, 
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -672,7 +639,7 @@ server <- function(input, output, session) {
       else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Gender') {
         ggplot(pred.data4, 
                aes(x = pre.weight, 
-                   y = abChange, 
+                   y = ab_change, 
                    colour = gender)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -687,7 +654,7 @@ server <- function(input, output, session) {
       else if (input$selectConti == 'Age' & input$selectCovar=='Diet') {
         ggplot(pred.data5, 
                aes(x = Age, 
-                   y = abChange, 
+                   y = ab_change, 
                    colour = Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -702,7 +669,7 @@ server <- function(input, output, session) {
       else if (input$selectConti == 'Height' & input$selectCovar == 'Diet') {
         ggplot(pred.data6, 
                aes(x = Height, 
-                   y = abChange, 
+                   y = ab_change, 
                    colour = Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -717,7 +684,7 @@ server <- function(input, output, session) {
       else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Diet') {
         ggplot(pred.data7, 
                aes(x = pre.weight, 
-                   y = abChange, 
+                   y = ab_change, 
                    colour = Diet)) + 
           geom_line() + 
           geom_point(data = diet) + 
@@ -809,32 +776,31 @@ server <- function(input, output, session) {
               panel.grid.minor = element_blank(),
               panel.background = element_blank(), 
               axis.line = element_line(colour = "black"))
-    }
-    )
+    })
   
   ###ANCOVA analysis table###
-  output$analysis1 <- renderPrint(
+  output$analysis1 <- renderDT(
     if (input$menu1 == 'Otter') {
-      anova(otters.model)
+      expr = anovaOters
       }
     else if (input$menu1 == 'Diet') {
       if (input$selectConti == 'Age' & input$selectCovar == 'Gender'){
-        anova(diet.model2)
+        expr = anovaDiet2
         }
       else if (input$selectConti == 'Height' & input$selectCovar == 'Gender'){
-        anova(diet.model3)
+        expr = anovaDiet3
         }
       else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Gender'){
-        anova(diet.model4)
+        expr = anovaDiet4
         }
       else if (input$selectConti == 'Age' & input$selectCovar == 'Diet'){
-        anova(diet.model5)
+        expr = anovaDiet5
         }
       else if (input$selectConti == 'Height' & input$selectCovar == 'Diet'){
-        anova(diet.model6)
+        expr = anovaDiet6
         }
       else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Diet'){
-        anova(diet.model7)
+        expr = anovaDiet7
         }
     }
     else if (input$menu1 == 'Random'){
@@ -894,39 +860,39 @@ server <- function(input, output, session) {
       comb <- rbind(dt,dt2)
       
       aov.model <- lm(Y~X+cov+cov:X, data = comb)
+      ancova <- round(anova(aov.model), 3)
       
       ##testing passing the model
       rand$randMod <- anova(aov.model)[3, "Pr(>F)"]
       
-      anova(aov.model)
-    }
-    )
+      ancova
+    })
 
   #####get p values for each interaction 
   
   var <- reactiveValues(p = 1)
   observe({
     if (input$menu1 == 'Otter') {
-      var$p <- as.numeric(anova(otters.model)[3,"Pr(>F)"])
+      var$p <- as.numeric(anovaOters[3,"Pr(>F)"])
       }
     else if (input$menu1 == 'Diet'){
       if (input$selectConti == 'Age' & input$selectCovar == 'Gender'){
-        var$p <- as.numeric(anova(diet.model2)[3,"Pr(>F)"])
+        var$p <- as.numeric(anovaDiet2[3,"Pr(>F)"])
         }
       else if (input$selectConti == 'Height' & input$selectCovar == 'Gender'){
-        var$p <- as.numeric(anova(diet.model3)[3,"Pr(>F)"])
+        var$p <- as.numeric(anovaDiet3[3,"Pr(>F)"])
         }
       else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Gender'){
-        var$p <- as.numeric(anova(diet.model4)[3,"Pr(>F)"])
+        var$p <- as.numeric(anovaDiet4[3,"Pr(>F)"])
         }
       else if (input$selectConti == 'Age' & input$selectCovar == 'Diet'){
-        var$p <- as.numeric(anova(diet.model5)[3,"Pr(>F)"])
+        var$p <- as.numeric(anovaDiet5[3,"Pr(>F)"])
         }
       else if (input$selectConti == 'Height' & input$selectCovar == 'Diet'){
-        var$p <- as.numeric(anova(diet.model6)[3,"Pr(>F)"])
+        var$p <- as.numeric(anovaDiet6[3,"Pr(>F)"])
         }
       else if (input$selectConti == 'Pre-diet Weight' & input$selectCovar == 'Diet'){
-        var$p <- as.numeric(anova(diet.model7)[3,"Pr(>F)"])
+        var$p <- as.numeric(anovaDiet7[3,"Pr(>F)"])
         }
     }
     else if (input$menu1 == 'Random'){
@@ -935,111 +901,59 @@ server <- function(input, output, session) {
   })
   
   output$p <- renderUI(
-    if (length(var$p) < 1) {
+    if (length(var$p) > 1) {
     }
-    else if (var$p <= 0.01){
+    else if (var$p <= 0.05){
       p(strong('P-value for this interaction is about', 
-                signif(var$p,1), 
+                signif(var$p,3), 
                 '.' , 
                 br(),
                 'Since the p-value is very small, the model without the interaction 
                term provides a poor explanation of the data.'))
       }
-    else if (var$p >= 0.2) {
+    else if (var$p > 0.5) {
       (strong('P-value for this interaction is about', 
-                    signif(var$p,1),
-                    '.' ,
-                    br(),
-                    'Since the p-value is very large, the model without the interaction 
+                signif(var$p,3),
+                '.' ,
+                br(),
+                'Since the p-value is very large, the model without the interaction 
               term provides a reasonable explanation of the data.'))
-    }
-    else {
-      strong('P-value for this interaction is about', 
-             signif(var$p,1),
-             '.')
     }
   )
   
   #  Game ----
-  numbers <- reactiveValues(strong = c(), 
-                            moderate = c(), 
-                            insig = c(), 
-                            index = c(), 
-                            question = data.frame())
-  
-  observeEvent(
-    eventExpr = input$pages,
-    handlerExpr = {
-      numbers$strong = sample(1:12,1)
-      numbers$moderate = sample(13:24,1)
-      numbers$insig = sample(25:36,1)
-      numbers$index = c("A","B","C")
-      numbers$question = cbind(bank[c(numbers$strong,numbers$moderate,numbers$insig),],
-                               numbers$index)
-      })
-       
-  observeEvent(
-    eventExpr = input$new,
-    handlerExpr = {
-      numbers$strong = sample(1:12,1)
-      numbers$moderate = sample(13:24,1)
-      numbers$insig = sample(25:36,1)
-      numbers$index = c("A","B","C")
-      numbers$question = cbind(bank[c(numbers$strong,numbers$moderate,numbers$insig),],
-                               numbers$index)
-    }
-  )
-    
-  
-  
+
   ## Set up matching columns ----
-  output$plotCol <- renderUI({
-    plots <- list(
-      "1" = img(src = numbers$question[numbers$question[7] == "A",4], 
-                width = "35%",
-                class = "expandable",
-                alt = numbers$question[numbers$question[7] == "A",5]),
-      "2" = img(src = numbers$question[numbers$question[7] == "B",4], 
-                width = "35%", 
-                class = "expandable",
-                alt = numbers$question[numbers$question[7] == "B",5]),
-      "3" = img(src = numbers$question[numbers$question[7] == "C",4], 
-                width = "35%",
-                class = "expandable",
-                alt = numbers$question[numbers$question[7] == "C",5]
-                )
-    )
+  for (i in 1:4) {
+    
+    data <- data.frame(
+      categorical = sample(c("A", "B"), 100, replace = TRUE),
+      numerical = rnorm(300),
+      response = rnorm(100))
+    
+    model <- lm(response ~ categorical + numerical + categorical:numerical, data = data)
+    anova <- round(anova(model), 3)
+    
+    output[[paste0("plot", i)]] <- renderPlot({
+      ggplot(data, aes(x = numerical, y = numerical, color = categorical)) +
+        geom_point() +
+        geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+        labs(title = paste("ANCOVA Model - Plot", i),
+             x = "Numerical Variable", y = "Response Variable")
+    })
+    
+    output[[paste0("summary", i)]] <- renderDT({
+      anova
+    })
+    
     sortable::rank_list(
       input_id = "rankplots",
       text = "Drag the plots into the same order as the outputs.",
-      labels = sample(plots, 
-                      size = length(plots))
+      labels = sample(paste0("summary", i), 
+                      size = length(paste0("summary", i)))
     )
-  })
-  
-  output$outputCol <- renderUI({
-    outputs <- list(
-      "1" = img(src = numbers$question[numbers$question[7] == "A",3], 
-                width = "60%",
-                class = "expandable",
-                alt = numbers$question[numbers$question[7] == "A",6]),
-      "2" = img(src = numbers$question[numbers$question[7] == "B",3], 
-                width = "60%", 
-                class = "expandable",
-                alt = numbers$question[numbers$question[7] == "A",6]),
-      "3" = img(src = numbers$question[numbers$question[7] == "C",3], 
-                width = "60%",
-                class = "expandable",
-                alt = numbers$question[numbers$question[7] == "A",6])
-    )
-    sortable::rank_list(
-      input_id = "rankoutputs",
-      text = "Drag the outputs into the same order as the plots.",
-      labels = sample(outputs, 
-                      size = length(outputs))
-    )
-  })
-  
+  }
+
   observeEvent(
     eventExpr = input$submit, 
     handlerExpr = {
@@ -1086,7 +1000,6 @@ server <- function(input, output, session) {
         output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon()
     }
   })
-
 }
 
 boastUtils::boastApp(ui = ui, server = server)
