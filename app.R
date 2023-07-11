@@ -866,7 +866,23 @@ server <- function(input, output, session) {
       rand$randMod <- anova(aov.model)[3, "Pr(>F)"]
       
       ancova
-    })
+    },
+    caption = "ANCOVA table",
+    style = "bootstrap4",
+    rownames = TRUE,
+    options = list(
+      responsive = TRUE,
+      scrollX = TRUE,
+      searching = FALSE,
+      paging = FALSE,
+      info = FALSE,
+      ordering = FALSE,
+      columnDefs = list(
+        list(className = "dt-center",
+             targets = 1:5)
+      )
+    )
+    )
 
   #####get p values for each interaction 
   
@@ -924,27 +940,57 @@ server <- function(input, output, session) {
   #  Game ----
 
   ## Set up matching columns ----
-  for (i in 1:4) {
+  for (i in 1:3) {
+    
+    numLevels <- sample(2:3, 1)
     
     data <- data.frame(
-      categorical = sample(c("A", "B"), 100, replace = TRUE),
-      numerical = rnorm(300),
-      response = rnorm(100))
+      factor = rep(LETTERS[1:numLevels], each = 20),
+      cov = rnorm(n = numLevels * 20, mean = 2, sd = 5),
+      residual = rnorm(n = numLevels * 20, mean = 0, sd = 1))
     
-    model <- lm(response ~ categorical + numerical + categorical:numerical, data = data)
+    coef = runif(n = 1, min = -5, max = 5)
+    factorEffects = c()
+    for (j in 1:(numLevels - 1)){
+      factorEffects[j] <- runif(n = 1, min = 1, max = 5)
+    }
+    factorEffects[numLevels] = -1 * sum(factorEffects)
+    
+    names(factorEffects) <- LETTERS[1:numLevels] 
+    gsam <- runif(n = 1, min = 12, max = 25)
+    data <- data %>%
+      mutate(
+        response = gsam + factorEffects[factor] + coef * cov + residual)
+      
+    model <- lm(response ~ factor + cov, data = data)
     anova <- round(anova(model), 3)
     
     output[[paste0("plot", i)]] <- renderPlot({
-      ggplot(data, aes(x = numerical, y = numerical, color = categorical)) +
+      ggplot(data, aes(x = cov, y = response, color = factor)) +
         geom_point() +
         geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
         labs(title = paste("ANCOVA Model - Plot", i),
              x = "Numerical Variable", y = "Response Variable")
     })
-    
+    print(i)
     output[[paste0("summary", i)]] <- renderDT({
       anova
-    })
+    },
+    caption = "ANCOVA table",
+    style = "bootstrap4",
+    rownames = TRUE,
+    options = list(
+      responsive = TRUE,
+      scrollX = TRUE,
+      searching = FALSE,
+      paging = FALSE,
+      info = FALSE,
+      ordering = FALSE,
+      columnDefs = list(
+        list(className = "dt-center",
+             targets = 1:5)
+      ))
+    )
     
     sortable::rank_list(
       input_id = "rankplots",
