@@ -359,7 +359,7 @@ ui <- list(
                   column(
                     width = 2,
                     bsButton(
-                      inputId = "new",
+                      inputId = "newChallenge",
                       label = "New",
                       size = "large",
                       style = "default",
@@ -994,15 +994,23 @@ server <- function(input, output, session) {
       )
     }
   )
-  for (i in 1:3) {
-    # sortable::rank_list(
-    #   input_id = "rankplots",
-    #   text = "Drag the plots into the same order as the outputs.",
-    #   labels = sample(paste0("summary", i), 
-    #                   size = length(paste0("summary", i)))
-    # )
+ 
+  for (x in 1:3) {
+    output[[paste0("rankplots", x)]] <- renderUI({
+      sortable::rank_list(
+        input_id = paste0("rankplots", x),
+        labels = c("plot1", "plot2", "plot3")
+      )
+    })
+    
+    output[[paste0("rankoutputs", x)]] <- renderUI({
+      sortable::rank_list(
+        input_id = paste0("rankoutputs", x),
+        labels =  c("summary1", "summary2", "summary3")
+      )
+    })
   }
-
+  
   observeEvent(
     eventExpr = input$submit, 
     handlerExpr = {
@@ -1016,20 +1024,89 @@ server <- function(input, output, session) {
           yes = "correct", 
           no = "incorrect")
       )}
-   #       if (attempts$numattempts == 1) {
-   #          gamescore <- isolate(as.integer(matches))
-   #         } 
-   #         else {
-   #           gamescore <- isolate(as.integer(matches))
-   #         }
-   #         if (gamescore == maxScore) {gamescore <- maxScore}
-   #      
-   #      output$score <- renderUI({
-   #        paste("Your Score:", gamescore)
-   #   }
-   # )
     }
-
+  )
+  
+  observeEvent(
+    eventExpr = input$newChallenge,
+    handlerExpr = {
+      matches <- input$rankplots == input$rankoutputs
+      attempts$numattempts <- isolate(attempts$numattempts) + 1
+      
+      updateButton(
+        session = session, 
+        inputId = "plot", 
+        disabled = FALSE
+      )
+      
+      lapply(
+        X = 1:3,
+        FUN = function(x) {
+          numLevels <- sample(2:5, 1)
+          data <- data.frame(
+            factor = rep(LETTERS[1:numLevels], each = 20),
+            cov = rnorm(n = numLevels * 20, mean = 2, sd = 5),
+            residual = rnorm(n = numLevels * 20, mean = 0, sd = 1)
+          )
+          
+          coef = runif(n = 1, min = -5, max = 5)
+          factorEffects = c()
+          for (j in 1:(numLevels - 1)) {
+            factorEffects[j] <- runif(n = 1, min = 1, max = 5)
+          }
+          factorEffects[numLevels] = -1 * sum(factorEffects)
+          names(factorEffects) <- LETTERS[1:numLevels]
+          
+          gsam <- runif(n = 1, min = 12, max = 25)
+          
+          data <- data %>%
+            mutate(
+              response = gsam + factorEffects[factor] + coef * cov + residual
+            )
+          
+          output[[paste0("plot", x)]] <- renderPlot(
+            expr = {
+              ggplot(
+                data = data,
+                mapping = aes(x = cov, y = response, color = factor)
+              ) +
+                geom_point() +
+                geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+                labs(
+                  title = paste("ANCOVA Model - Plot", x),
+                  x = "Covariate",
+                  y = "Response"
+                ) +
+                theme_bw() +
+                theme(text = element_text(size = 18))
+            },
+            alt = "Descriptive text here"
+          )
+          
+          model <- lm(response ~ factor + cov, data = data)
+          anova <- round(anova(model), 3)
+          
+          output[[paste0("summary", x)]] <- renderDT(
+            expr = {anova},
+            caption = paste("ANCOVA Table", LETTERS[x]),
+            style = "bootstrap4",
+            rownames = TRUE,
+            options = list(
+              responsive = TRUE,
+              scrollX = TRUE,
+              searching = FALSE,
+              paging = FALSE,
+              info = FALSE,
+              ordering = FALSE,
+              columnDefs = list(
+                list(className = "dt-center",
+                     targets = 1:5)
+              )
+            )
+          )
+        }
+      )
+    }
   )
   
   # Clear feedback ----
