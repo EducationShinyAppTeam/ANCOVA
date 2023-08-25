@@ -302,18 +302,32 @@ ui <- list(
                 fluidRow(
                   column(
                     width = 6,
-                    plotOutput("plot1"),
-                    plotOutput("plot2"),
-                    plotOutput("plot3")
+                    # plotOutput("plot1"),
+                    # plotOutput("plot2"),
+                    # plotOutput("plot3")
                   ),
                   column(
                     width = 6,
                     offset = 0,
-                    dataTableOutput("summary1"),
-                    dataTableOutput("summary2"),
-                    dataTableOutput("summary3")
+                    # dataTableOutput("summary1"),
+                    # dataTableOutput("summary2"),
+                    # dataTableOutput("summary3")
                   )
                 ),
+                hr(),
+                fluidRow(
+                  column(
+                    width = 6,
+                    p("Main Col"),
+                    uiOutput("mainCol")
+                  ),
+                  column(
+                    width = 6,
+                    p("Second Col"),
+                    uiOutput("secondCol")
+                  )
+                ),
+                hr(),
                 br(),
                 fluidRow(
                   column(
@@ -966,7 +980,8 @@ server <- function(input, output, session) {
               y = "Response"
             ) +
             theme_bw() +
-            theme(text = element_text(size = 18))
+            theme(text = element_text(size = 18)
+            )
         },
         alt = "Descriptive text here"
       )
@@ -995,35 +1010,81 @@ server <- function(input, output, session) {
     }
   )
  
-  for (x in 1:3) {
-    output[[paste0("rankplots", x)]] <- renderUI({
-      sortable::rank_list(
-        input_id = paste0("rankplots", x),
-        labels = c("plot1", "plot2", "plot3")
+  # for (x in 1:3) {
+  #   output[[paste0("rankplots", x)]] <- renderUI({
+  #     sortable::rank_list(
+  #       input_id = paste0("rankplots", x),
+  #       labels = c("plot1", "plot2", "plot3")
+  #     )
+  #   })
+  #   
+  #   output[[paste0("rankoutputs", x)]] <- renderUI({
+  #     sortable::rank_list(
+  #       input_id = paste0("rankoutputs", x),
+  #       labels =  c("summary1", "summary2", "summary3")
+  #     )
+  #   })
+  # }
+  
+  # Sortable ----
+  output$mainCol <- renderUI(
+    expr = {
+      # Create a list of plots
+      # "plotList" with named elements
+      plotList <- list(
+        "A" = plotOutput("plot1"),
+        "B" = plotOutput("plot2"),
+        "C" = plotOutput("plot3")
       )
-    })
-    
-    output[[paste0("rankoutputs", x)]] <- renderUI({
+      
+      # Create ranking list
       sortable::rank_list(
-        input_id = paste0("rankoutputs", x),
-        labels =  c("summary1", "summary2", "summary3")
+        input_id = "rankPlots",
+        text = "Drag the plots into the same order as the summary tables.",
+        labels = sample(plotList, size = length(plotList))
       )
-    })
-  }
+      
+    }
+  )
+  
+  output$secondCol <- renderUI(
+    expr = {
+      # Create a list of plots
+      # "tableList" with named elements
+      tableList <- list(
+        "A" = dataTableOutput("summary1"),
+        "B" = dataTableOutput("summary2"),
+        "C" = dataTableOutput("summary3")
+      )
+      # Create ranking list
+      sortable::rank_list(
+        input_id = "rankTables",
+        text = "Drag the summary tables into the same order as the plots.",
+        labels = sample(tableList, size = length(tableList))
+      )
+      
+    }
+  )
   
   observeEvent(
     eventExpr = input$submit, 
     handlerExpr = {
-    matches <- input$rankplots == input$rankoutputs
-    attempts$numattempts <- isolate(attempts$numattempts) + 1
-    
-    for(i in 1:3){
-      output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon(
-        icon = ifelse(
-          test = matches[i], 
-          yes = "correct", 
-          no = "incorrect")
-      )}
+      print(input$rankPlots)
+      print("other")
+      print(input$rankTables)
+      print("matching")
+      print(input$rankPlots == input$rankTable)
+      print(as.numeric(input$rankPlots == input$rankTable))
+    # matches <- input$rankplots == input$rankoutputs
+    # attempts$numattempts <- isolate(attempts$numattempts) + 1
+    # 
+    # for(i in 1:3){
+    #   output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon(
+    #     icon = ifelse(
+    #       test = matches[i], 
+    #       yes = "correct", 
+    #       no = "incorrect")
+    #   )}
     }
   )
   
