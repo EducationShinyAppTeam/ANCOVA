@@ -302,32 +302,13 @@ ui <- list(
                 fluidRow(
                   column(
                     width = 6,
-                    # plotOutput("plot1"),
-                    # plotOutput("plot2"),
-                    # plotOutput("plot3")
-                  ),
-                  column(
-                    width = 6,
-                    offset = 0,
-                    # dataTableOutput("summary1"),
-                    # dataTableOutput("summary2"),
-                    # dataTableOutput("summary3")
-                  )
-                ),
-                hr(),
-                fluidRow(
-                  column(
-                    width = 6,
-                    p("Main Col"),
                     uiOutput("mainCol")
                   ),
                   column(
                     width = 6,
-                    p("Second Col"),
                     uiOutput("secondCol")
                   )
                 ),
-                hr(),
                 br(),
                 fluidRow(
                   column(
@@ -941,10 +922,10 @@ server <- function(input, output, session) {
   #  Game ----
 
   ## Set up matching columns ----
+  numLevels <- sample(2:3, 1)
   lapply(
     X = 1:3,
     FUN = function(x) {
-      numLevels <- sample(2:5, 1)
       data <- data.frame(
         factor = rep(LETTERS[1:numLevels], each = 20),
         cov = rnorm(n = numLevels * 20, mean = 2, sd = 5),
@@ -961,21 +942,76 @@ server <- function(input, output, session) {
       
       gsam <- runif(n = 1, min = 12, max = 25)
       
-      data <- data %>%
+      data1 <- data %>%
+        mutate(
+          response = gsam + factorEffects[factor] + residual
+        )
+      data2 <- data %>%
         mutate(
           response = gsam + factorEffects[factor] + coef * cov + residual
         )
+      data3 <- data %>%
+        mutate(
+          response = gsam + factorEffects[factor] + coef * cov + 
+            factorEffects[factor] * coef * cov + residual
+        )
       
-      output[[paste0("plot", x)]] <- renderPlot(
+      model1 <- lm(response ~ cov, data = data1)
+      model2 <- lm(response ~ factor + cov, data = data2)
+      model3 <- lm(response ~ factor + cov + factor * cov, data = data3)
+      
+      anova1 <- round(anova(model1), 1)
+      anova2 <- round(anova(model2), 1)
+      anova3 <- round(anova(model3), 1)
+      
+      output$plot1 <- renderPlot(
         expr = {
           ggplot(
-            data = data,
+            data = data1,
             mapping = aes(x = cov, y = response, color = factor)
           ) +
             geom_point() +
             geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
             labs(
-              title = paste("ANCOVA Model - Plot", x),
+              title = paste("ANCOVA Model - Plot"),
+              x = "Covariate",
+              y = "Response"
+            ) +
+            theme_bw() +
+            theme(text = element_text(size = 18)
+            )
+        },
+        alt = "Descriptive text here"
+      )
+      output$plot2 <- renderPlot(
+        expr = {
+          ggplot(
+            data = data2,
+            mapping = aes(x = cov, y = response, color = factor)
+          ) +
+            geom_point() +
+            geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+            labs(
+              title = paste("ANCOVA Model - Plot"),
+              x = "Covariate",
+              y = "Response"
+            ) +
+            theme_bw() +
+            theme(text = element_text(size = 18)
+            )
+        },
+        alt = "Descriptive text here"
+      )
+      output$plot3 <- renderPlot(
+        expr = {
+          ggplot(
+            data = data3,
+            mapping = aes(x = cov, y = response, color = factor)
+          ) +
+            geom_point() +
+            geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+            labs(
+              title = paste("ANCOVA Model - Plot"),
               x = "Covariate",
               y = "Response"
             ) +
@@ -986,12 +1022,45 @@ server <- function(input, output, session) {
         alt = "Descriptive text here"
       )
       
-      model <- lm(response ~ factor + cov, data = data)
-      anova <- round(anova(model), 3)
-      
-      output[[paste0("summary", x)]] <- renderDT(
-        expr = {anova},
-        caption = paste("ANCOVA Table", LETTERS[x]),
+      output$summary1 <- renderDT(
+        expr = {anova1},
+        caption = paste("ANCOVA Table"),
+        style = "bootstrap4",
+        rownames = TRUE,
+        options = list(
+          responsive = TRUE,
+          scrollX = TRUE,
+          searching = FALSE,
+          paging = FALSE,
+          info = FALSE,
+          ordering = FALSE,
+          columnDefs = list(
+            list(className = "dt-center",
+                 targets = 1:5)
+          )
+        )
+      )
+      output$summary2 <- renderDT(
+        expr = {anova2},
+        caption = paste("ANCOVA Table"),
+        style = "bootstrap4",
+        rownames = TRUE,
+        options = list(
+          responsive = TRUE,
+          scrollX = TRUE,
+          searching = FALSE,
+          paging = FALSE,
+          info = FALSE,
+          ordering = FALSE,
+          columnDefs = list(
+            list(className = "dt-center",
+                 targets = 1:5)
+          )
+        )
+      )
+      output$summary3 <- renderDT(
+        expr = {anova3},
+        caption = paste("ANCOVA Table"),
         style = "bootstrap4",
         rownames = TRUE,
         options = list(
@@ -1009,22 +1078,6 @@ server <- function(input, output, session) {
       )
     }
   )
- 
-  # for (x in 1:3) {
-  #   output[[paste0("rankplots", x)]] <- renderUI({
-  #     sortable::rank_list(
-  #       input_id = paste0("rankplots", x),
-  #       labels = c("plot1", "plot2", "plot3")
-  #     )
-  #   })
-  #   
-  #   output[[paste0("rankoutputs", x)]] <- renderUI({
-  #     sortable::rank_list(
-  #       input_id = paste0("rankoutputs", x),
-  #       labels =  c("summary1", "summary2", "summary3")
-  #     )
-  #   })
-  # }
   
   # Sortable ----
   output$mainCol <- renderUI(
@@ -1069,24 +1122,21 @@ server <- function(input, output, session) {
   observeEvent(
     eventExpr = input$submit, 
     handlerExpr = {
-      print(input$rankPlots)
-      print("other")
-      print(input$rankTables)
-      print("matching")
-      print(input$rankPlots == input$rankTable)
-      print(as.numeric(input$rankPlots == input$rankTable))
-    # matches <- input$rankplots == input$rankoutputs
-    # attempts$numattempts <- isolate(attempts$numattempts) + 1
-    # 
-    # for(i in 1:3){
-    #   output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon(
-    #     icon = ifelse(
-    #       test = matches[i], 
-    #       yes = "correct", 
-    #       no = "incorrect")
-    #   )}
-    }
-  )
+      userRankPlots <- input$rankPlots
+      userRankTables <- input$rankTables
+      
+      matches <- userRankPlots == userRankTables
+      
+      for(i in 1:3){
+        output[[paste0("feedbackP", i)]] <- boastUtils::renderIcon(
+          icon = ifelse(
+            test = matches[i], 
+            yes = "correct", 
+            no = "incorrect")
+        )
+      }
+      }
+    )
   
   observeEvent(
     eventExpr = input$newChallenge,
@@ -1100,10 +1150,10 @@ server <- function(input, output, session) {
         disabled = FALSE
       )
       
+      numLevels <- sample(2:3, 1)
       lapply(
         X = 1:3,
         FUN = function(x) {
-          numLevels <- sample(2:5, 1)
           data <- data.frame(
             factor = rep(LETTERS[1:numLevels], each = 20),
             cov = rnorm(n = numLevels * 20, mean = 2, sd = 5),
@@ -1120,36 +1170,114 @@ server <- function(input, output, session) {
           
           gsam <- runif(n = 1, min = 12, max = 25)
           
-          data <- data %>%
+          
+          data1 <- data %>%
+            mutate(
+              response = gsam + factorEffects[factor] + residual
+            )
+          data2 <- data %>%
             mutate(
               response = gsam + factorEffects[factor] + coef * cov + residual
             )
+          data3 <- data %>%
+            mutate(
+              response = gsam + factorEffects[factor] + coef * cov + 
+                factorEffects[factor] * coef * cov + residual
+            )
           
-          output[[paste0("plot", x)]] <- renderPlot(
-            expr = {
-              ggplot(
-                data = data,
-                mapping = aes(x = cov, y = response, color = factor)
+          model1 <- lm(response ~ cov, data = data1)
+          model2 <- lm(response ~ factor + cov, data = data2)
+          model3 <- lm(response ~ factor + cov + factor * cov, data = data3)
+          
+          anova1 <- round(anova(model1), 1)
+          anova2 <- round(anova(model2), 1)
+          anova3 <- round(anova(model3), 1)
+          
+          output$plot1 <- renderPlot({
+            ggplot(
+              data = data1,
+              mapping = aes(x = cov, y = response, color = factor)
+            ) +
+              geom_point() +
+              geom_smooth(formula = 'y ~ x', method = "lm", se = FALSE) +
+              labs(
+                title = paste("ANCOVA Model - Plot"),
+                x = "Covariate",
+                y = "Response"
               ) +
-                geom_point() +
-                geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
-                labs(
-                  title = paste("ANCOVA Model - Plot", x),
-                  x = "Covariate",
-                  y = "Response"
-                ) +
-                theme_bw() +
-                theme(text = element_text(size = 18))
-            },
-            alt = "Descriptive text here"
+              theme_bw() +
+              theme(text = element_text(size = 18))
+          })
+          output$plot2 <- renderPlot({
+            ggplot(
+              data = data2,
+              mapping = aes(x = cov, y = response, color = factor)
+            ) +
+              geom_point() +
+              geom_smooth(formula = 'y ~ x', method = "lm", se = FALSE) +
+              labs(
+                title = paste("ANCOVA Model - Plot"),
+                x = "Covariate",
+                y = "Response"
+              ) +
+              theme_bw() +
+              theme(text = element_text(size = 18))
+          })
+          output$plot3 <- renderPlot({
+            ggplot(
+              data = data3,
+              mapping = aes(x = cov, y = response, color = factor)
+            ) +
+              geom_point() +
+              geom_smooth(formula = 'y ~ x', method = "lm", se = FALSE) +
+              labs(
+                title = paste("ANCOVA Model - Plot"),
+                x = "Covariate",
+                y = "Response"
+              ) +
+              theme_bw() +
+              theme(text = element_text(size = 18))
+          })
+          
+          output$summary1 <- renderDT(
+            expr = {anova1},
+            caption = paste("ANCOVA Table"),
+            style = "bootstrap4",
+            rownames = TRUE,
+            options = list(
+              responsive = TRUE,
+              scrollX = TRUE,
+              searching = FALSE,
+              paging = FALSE,
+              info = FALSE,
+              ordering = FALSE,
+              columnDefs = list(
+                list(className = "dt-center",
+                     targets = 1:5)
+              )
+            )
           )
-          
-          model <- lm(response ~ factor + cov, data = data)
-          anova <- round(anova(model), 3)
-          
-          output[[paste0("summary", x)]] <- renderDT(
-            expr = {anova},
-            caption = paste("ANCOVA Table", LETTERS[x]),
+          output$summary2 <- renderDT(
+            expr = {anova2},
+            caption = paste("ANCOVA Table"),
+            style = "bootstrap4",
+            rownames = TRUE,
+            options = list(
+              responsive = TRUE,
+              scrollX = TRUE,
+              searching = FALSE,
+              paging = FALSE,
+              info = FALSE,
+              ordering = FALSE,
+              columnDefs = list(
+                list(className = "dt-center",
+                     targets = 1:5)
+              )
+            )
+          )
+          output$summary3 <- renderDT(
+            expr = {anova3},
+            caption = paste("ANCOVA Table"),
             style = "bootstrap4",
             rownames = TRUE,
             options = list(
@@ -1167,6 +1295,10 @@ server <- function(input, output, session) {
           )
         }
       )
+      
+      output$feedback1 <- renderIcon()
+      output$feedback2 <- renderIcon()
+      output$feedback3 <- renderIcon()
     }
   )
   
