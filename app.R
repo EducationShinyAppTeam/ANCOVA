@@ -93,7 +93,7 @@ ui <- list(
           br(),
           h2('Acknowledgements'),
           p("This app was developed and coded by Luxin Wang and modified by
-            Zhiruo Wang, Lydia Bednarczyk, and Phichchaya Sutaporn.",
+            Zhiruo Wang, Lydia Bednarczyk, and Phichchaya Sutaporn, with updates by Xin Yun (2024).",
             br(),
             br(),
             "Cite this app as:",
@@ -101,7 +101,7 @@ ui <- list(
             boastUtils::citeApp(),
             br(),
             br(),
-            div(class = "updated", "Last Update: 06/13/2022 by Phichchaya Sutaporn.")
+            div(class = "updated", "Last Update: 6/02/2024 by Xin Yun.")
           )
         ),
         ### Prerequisites page ----
@@ -112,7 +112,7 @@ ui <- list(
             Variance (',
              a(href = 'https://psu-eberly.shinyapps.io/ANOVA_Models/', 
               'ANOVA', class = 'bodylinks'), ') with at least one continuous variables included in
-            the model. The information below will explain highlight the differences
+            the model. The information below will explain and highlight the differences
             between ANOVA, Regression, and ANCOVA.'),
             
           tags$table(
