@@ -225,7 +225,7 @@ ui <- list(
                   min = -5,
                   max = 5,
                   value = 0,
-                  step = 1)
+                  step = 0.1)
                 ,
                 sliderInput(
                   inputId = 'slope2',
@@ -233,7 +233,7 @@ ui <- list(
                   min = -5,
                   max = 5,
                   value = 0,
-                  step = 1
+                  step = 0.1
                 ),
                 sliderInput(
                   inputId = 'inter1',
@@ -351,6 +351,7 @@ ui <- list(
                   # )
                 ),
         ),
+        ### Reference page ----
         tabItem(
           tabName = "refs",
           withMathJax(),
@@ -878,9 +879,7 @@ server <- function(input, output, session) {
   })
   
   output$p <- renderUI(
-    if (length(var$p) > 1) {
-    }
-    else if (var$p <= 0.05){
+    if (var$p <= 0.01){
       p(strong('P-value for this interaction is about', 
                 signif(var$p,3), 
                 '.' , 
@@ -888,12 +887,20 @@ server <- function(input, output, session) {
                 'Since the p-value is very small, the model without the interaction 
                term provides a poor explanation of the data.'))
       }
-    else if (var$p > 0.05) {
+    else if (var$p <= 0.1) {
       (strong('P-value for this interaction is about', 
                 signif(var$p,3),
                 '.' ,
                 br(),
-                'Since the p-value is very large, the model without the interaction 
+                'Since the p-value is neither very large nor small, different standards may interpret
+                how reasonable the null model is in this case.'))
+    }
+    else {
+      (strong('P-value for this interaction is about', 
+              signif(var$p,3),
+              '.' ,
+              br(),
+              'Since the p-value is very large, the model without the interaction 
               term provides a reasonable explanation of the data.'))
     }
   )
