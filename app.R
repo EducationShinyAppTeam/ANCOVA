@@ -888,7 +888,7 @@ server <- function(input, output, session) {
                 'Since the p-value is very small, the model without the interaction 
                term provides a poor explanation of the data.'))
       }
-    else if (var$p > 0.5) {
+    else if (var$p > 0.05) {
       (strong('P-value for this interaction is about', 
                 signif(var$p,3),
                 '.' ,
