@@ -173,18 +173,7 @@ ui <- list(
             understanding of what properties of the plots satisfy the assumptions,
             look at the',
             a(href = 'https://psu-eberly.shinyapps.io/Assumptions_of_ANOVA/', 
-              'Assumptions of ANOVA', class = 'bodylinks'), 'app.'),
-          br(),
-          div(
-            style = "text-align: center;",
-            bsButton(
-              inputId = "start",
-              label = "Explore!",
-              icon = icon("bolt"),
-              style = "default",
-              size = "large"
-            )
-          )
+              'Assumptions of ANOVA', class = 'bodylinks'), 'app.')
         ),
         ### Explore page ----
         tabItem(
@@ -278,16 +267,6 @@ ui <- list(
               tags$b(dataTableOutput('analysis1')),
               br(),
               uiOutput('p')
-            )
-          ),
-          br(),
-          fluidRow(
-            div(style = "text-align: center",
-                bsButton(inputId = "game",
-                         label = "Play!",
-                         icon = icon("bolt"),
-                         style = "default",
-                         size = "large")
             )
           )
         ),
